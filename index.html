@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="fa-IR" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#0B0D12" />
+<meta name="description" content="GAME OF THE WITCHER — bilingual geopolitical strategy (frontend demo)." />
+<title>GAME OF THE WITCHER</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230B0D12'/%3E%3Cpath d='M18 44 L26 20 L32 34 L38 20 L46 44 Z' fill='%2342D9FF'/%3E%3C/svg%3E" />
+<style>
+:root{
+  --bg:#0B0D12; --surface:#131722; --surface2:#191F2C;
+  --primary:#42D9FF; --secondary:#8B7CFF;
+  --success:#34D399; --warning:#F5A623; --error:#EF4444;
+  --text:#fff; --muted:#8A93A6; --border:#232A38;
+  --radius:12px; --radius-sm:8px; --gap:8px; --gap2:16px; --gap3:24px;
+  --font:"Vazirmatn",Tahoma,Arial,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,input,textarea,select{font:inherit;color:inherit;background:none;border:none;outline:none}
+button{cursor:pointer}
+img{max-width:100%;display:block}
+h1,h2,h3,h4{margin:0 0 8px}
+h1{font-size:22px}h2{font-size:18px}h3{font-size:16px}h4{font-size:14px}
+a{color:var(--primary);text-decoration:none}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.hint{color:var(--muted);font-size:12px;margin-top:8px}
+.mt-8{margin-top:8px}
+.divider{border:none;border-top:1px solid var(--border);margin:12px 0}
+hr.divider{border-top:1px solid var(--border)}
+
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:16px;background:radial-gradient(1200px 600px at 50% -10%,rgba(66,217,255,.08),transparent 60%),var(--bg)}
+.auth-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.brand-line{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.brand-line .mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:grid;place-items:center;color:#04121a;font-weight:800}
+.brand-line strong{letter-spacing:.5px}
+.auth-tabs{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap}
+.auth-tab{flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--muted);font-size:13px}
+.auth-tab.active{background:var(--primary);color:#04121a;border-color:var(--primary);font-weight:700}
+.form label,.auth-card label{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;font-size:13px;color:var(--muted)}
+.form input,.form textarea,.form select,.auth-card input,.auth-card select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);font-size:14px;width:100%}
+.form textarea{min-height:100px;resize:vertical}
+.error-text{color:var(--error);font-size:13px;margin-top:8px}
+.warn-banner{margin-top:12px;padding:10px;border:1px solid rgba(245,166,35,.35);background:rgba(245,166,35,.06);color:var(--warning);font-size:12px;border-radius:var(--radius-sm)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;transition:background .15s,border-color .15s,transform .05s}
+.btn:hover{background:#20283a}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--primary);color:#04121a;border-color:var(--primary);font-weight:700}
+.btn-primary:hover{background:#5fe2ff}
+.btn-danger{border-color:rgba(239,68,68,.4);color:#ff8d8d}
+.btn-ghost{background:transparent}
+.btn-block{width:100%;justify-content:center}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:var(--surface);border-inline-end:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:12px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar .brand{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.sidebar .brand .mark{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:grid;place-items:center;font-weight:800;color:#04121a}
+.sidebar .brand strong{font-size:13px;letter-spacing:.5px}
+.demo-banner{font-size:11px;text-align:center}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:var(--radius-sm);color:var(--muted);text-align:start;font-size:13px}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(66,217,255,.1);color:var(--primary);font-weight:600}
+.pill{background:var(--error);color:#fff;border-radius:99px;font-size:11px;padding:1px 6px;min-width:18px;text-align:center}
+
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+.menu-btn{display:none}
+.topbar-title{flex:1;min-width:0}
+.topbar-title h2{margin:0;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.resource-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--border);font-size:12px}
+.chip-icon{font-size:13px}
+.lang-btn{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-size:12px;color:var(--muted)}
+.lang-btn.active{background:var(--primary);color:#04121a;border-color:var(--primary);font-weight:700}
+.icon-btn{position:relative;width:34px;height:34px;display:grid;place-items:center;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border)}
+.dot{position:absolute;top:6px;inset-inline-end:6px;width:8px;height:8px;border-radius:50%;background:var(--error)}
+
+.view{padding:20px;max-width:1200px;width:100%;margin:0 auto}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:var(--gap2)}
+.card h3,.card h4{margin-bottom:10px}
+.grid{display:grid;gap:var(--gap2)}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid-stats{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:var(--gap2)}
+.stat{display:flex;align-items:center;gap:10px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.stat-icon{font-size:20px}
+.stat-label{font-size:11px;color:var(--muted);margin-bottom:2px}
+.stat-value{font-weight:700;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip-btn{cursor:pointer}
+.chip-btn.active{background:var(--primary);color:#04121a;border-color:var(--primary);font-weight:700}
+.badge{display:inline-block;padding:2px 8px;font-size:11px;border-radius:99px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.badge-success{border-color:rgba(52,211,153,.4);color:var(--success);background:rgba(52,211,153,.08)}
+.badge-warn{border-color:rgba(245,166,35,.4);color:var(--warning);background:rgba(245,166,35,.08)}
+.badge-error{border-color:rgba(239,68,68,.4);color:var(--error);background:rgba(239,68,68,.08)}
+.empty{padding:20px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--border);border-radius:var(--radius-sm)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.simple-list{list-style:none;padding:0;margin:8px 0;display:flex;flex-direction:column;gap:8px}
+.simple-list li{padding:10px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.item-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;flex-wrap:wrap}
+.item-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.price{font-weight:700;color:var(--primary)}
+
+.post-form{display:flex;flex-direction:column;gap:8px}
+.post-form textarea,.post-form input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;min-height:80px;resize:vertical}
+.post-form input[type=text]{min-height:auto}
+.post-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.feed{display:flex;flex-direction:column;gap:12px}
+.post{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.post-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.post-body{white-space:pre-wrap;margin:0 0 10px}
+.post-actions .btn{font-size:12px;padding:4px 8px}
+
+.chat{max-height:260px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px}
+.chat-msg{padding:6px 0;border-bottom:1px dashed var(--border)}
+.chat-msg:last-child{border-bottom:none}
+.chat-msg p{margin:4px 0 0;font-size:13px;white-space:pre-wrap}
+
+.ai-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.ai-history{display:flex;flex-direction:column;gap:10px;margin:10px 0}
+.ai-entry{padding:10px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.ai-user{font-size:13px;color:var(--primary);margin-bottom:6px;white-space:pre-wrap}
+.ai-response strong{display:block;margin-bottom:4px}
+.ai-response p{margin:0;font-size:13px;white-space:pre-wrap}
+
+.country-pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.country-pick-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:8px}
+.country-pick-card.claimed{opacity:.55}
+.country-pick-head{display:flex;align-items:center;gap:8px}
+.country-pick-head .flag{font-size:22px}
+.country-pick-head strong{font-size:14px}
+.country-pick-card .desc{font-size:12px;color:var(--muted);min-height:34px}
+.country-pick-card .meta{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}
+
+#toast-region{position:fixed;bottom:16px;inset-inline-end:16px;display:flex;flex-direction:column;gap:8px;z-index:1000;max-width:90vw}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.5);transition:opacity .3s,transform .3s}
+.toast-success{border-inline-start:3px solid var(--success)}
+.toast-error{border-inline-start:3px solid var(--error)}
+.toast-info{border-inline-start:3px solid var(--primary)}
+.toast-out{opacity:0;transform:translateY(6px)}
+
+.mobile-nav{display:none;position:fixed;bottom:0;inset-inline:0;background:var(--surface);border-top:1px solid var(--border);z-index:30;padding:4px;justify-content:space-around}
+.mobile-nav-item{padding:8px 4px;color:var(--muted);font-size:11px;flex:1;text-align:center;border-radius:var(--radius-sm)}
+.mobile-nav-item.active{color:var(--primary)}
+.mobile-label{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-backdrop{display:none}
+
+@media (max-width:840px){
+  .shell{grid-template-columns:1fr;padding-bottom:64px}
+  .menu-btn{display:grid}
+  .sidebar{position:fixed;inset-inline-start:0;top:0;bottom:0;width:260px;transform:translateX(-110%);transition:transform .25s;z-index:40;height:100vh}
+  [dir="rtl"] .sidebar{transform:translateX(110%);inset-inline-start:0;inset-inline-end:auto}
+  .shell.sidebar-open .sidebar{transform:translateX(0)}
+  .shell.sidebar-open .sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:35}
+  .mobile-nav{display:flex}
+  .view{padding:12px;padding-bottom:80px}
+  .resource-chips{display:none}
+  .topbar{padding:10px 12px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="toast-region" role="status" aria-live="polite"></div>
+<div id="app"></div>
+
+<script>
+"use strict";
+
+/* ================================================================
+   GAME OF THE WITCHER — v2 (75 countries + religions)
+   Frontend prototype only. No secure auth. See README in next step.
+   ================================================================ */
+
+/* ---------- Religions ---------- */
+const RELIGIONS = {
+  islam_sunni:            {fa:"اسلام (سنی)",            en:"Sunni Islam",             icon:"☪️"},
+  islam_shia:             {fa:"اسلام (شیعه)",           en:"Shia Islam",              icon:"☪️"},
+  christianity_catholic:  {fa:"مسیحیت (کاتولیک)",       en:"Catholic Christianity",    icon:"✝️"},
+  christianity_protestant:{fa:"مسیحیت (پروتستان)",     en:"Protestant Christianity",  icon:"✝️"},
+  christianity_orthodox:  {fa:"مسیحیت (ارتدوکس)",       en:"Orthodox Christianity",    icon:"☦️"},
+  zoroastrianism:         {fa:"زرتشتی",                 en:"Zoroastrianism",           icon:"🔥"},
+  judaism:                {fa:"یهودیت",                 en:"Judaism",                  icon:"✡️"},
+  buddhism:               {fa:"بودیسم",                 en:"Buddhism",                 icon:"☸️"},
+  hinduism:               {fa:"هندوئیسم",               en:"Hinduism",                 icon:"🕉️"},
+  shinto:                 {fa:"شینتو",                  en:"Shinto",                   icon:"⛩️"},
+  taoism:                 {fa:"تائوئیسم",               en:"Taoism",                   icon:"☯️"},
+  confucianism:           {fa:"کنفوسیوسیسم",            en:"Confucianism",             icon:"📜"},
+  tengrism:               {fa:"تنگریسم",                en:"Tengrism",                 icon:"🐺"},
+  norse_paganism:         {fa:"پاگانیسم نورس",          en:"Norse Paganism",           icon:"⚡"},
+  egyptian_polytheism:    {fa:"چندخدایی مصر",           en:"Egyptian Polytheism",      icon:"🐈"},
+  greek_polytheism:       {fa:"چندخدایی یونان",         en:"Greek Polytheism",         icon:"🏛️"},
+  roman_polytheism:       {fa:"چندخدایی روم",           en:"Roman Polytheism",         icon:"🏛️"},
+  babylonian_polytheism:  {fa:"چندخدایی بابل",          en:"Babylonian Polytheism",    icon:"🏛️"},
+  mesopotamian_polytheism:{fa:"چندخدایی بین‌النهرین",   en:"Mesopotamian Polytheism",  icon:"🏛️"},
+  punic_polytheism:       {fa:"چندخدایی فنیقی",         en:"Punic Polytheism",         icon:"⚓"},
+  aztec_polytheism:       {fa:"چندخدایی آزتک",          en:"Aztec Polytheism",         icon:"🌞"},
+  inca_religion:          {fa:"دین اینکا",              en:"Inca Religion",            icon:"🌄"},
+  secular:                {fa:"سکولار",                 en:"Secular",                  icon:"⚖️"},
+  state_atheism:          {fa:"بی‌خدایی دولتی",          en:"State Atheism",            icon:"🚫"},
+  mixed:                  {fa:"ترکیبی",                 en:"Mixed",                    icon:"🌍"}
+};
+
+const ERAS = {
+  modern:     {fa:"مدرن",    en:"Modern",     icon:"🌐"},
+  historical: {fa:"تاریخی",  en:"Historical", icon:"🏛️"}
+};
+
+/* ---------- Countries (75 total: 50 modern + 25 historical) ---------- */
+const COUNTRIES = [
+  /* ===== MODERN ===== */
+  {id:"ir",flag:"🇮🇷",name:{fa:"ایران",en:"Iran"},desc:{fa:"جمهوری اسلامی با منابع نفت و گاز فراوان.",en:"An Islamic Republic rich in oil and gas."},region:"west",government:{fa:"جمهوری اسلامی",en:"Islamic Republic"},religion:"islam_shia",era:"modern",population:89000000,resources:{diamonds:2,gold:8,oil:55,iron:18,coal:12,uranium:3}},
+  {id:"us",flag:"🇺🇸",name:{fa:"ایالات متحده آمریکا",en:"United States"},desc:{fa:"قدرت اقتصادی و نظامی جهانی.",en:"A global economic and military power."},region:"west",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"christianity_protestant",era:"modern",population:335000000,resources:{diamonds:10,gold:20,oil:60,iron:30,coal:40,uranium:12}},
+  {id:"ru",flag:"🇷🇺",name:{fa:"روسیه",en:"Russia"},desc:{fa:"بزرگ‌ترین کشور جهان با منابع عظیم انرژی.",en:"The largest country with vast energy reserves."},region:"north",government:{fa:"فدراسیون",en:"Federation"},religion:"christianity_orthodox",era:"modern",population:144000000,resources:{diamonds:14,gold:18,oil:70,iron:35,coal:45,uranium:9}},
+  {id:"cn",flag:"🇨🇳",name:{fa:"چین",en:"China"},desc:{fa:"قدرت صنعتی و تجاری اول جهان.",en:"The world's leading industrial power."},region:"east",government:{fa:"جمهوری خلق",en:"People's Republic"},religion:"mixed",era:"modern",population:1412000000,resources:{diamonds:6,gold:12,oil:20,iron:45,coal:60,uranium:5}},
+  {id:"de",flag:"🇩🇪",name:{fa:"آلمان",en:"Germany"},desc:{fa:"قدرت اقتصادی اروپا.",en:"Europe's economic powerhouse."},region:"west",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"christianity_protestant",era:"modern",population:84000000,resources:{diamonds:2,gold:4,oil:6,iron:20,coal:22,uranium:2}},
+  {id:"fr",flag:"🇫🇷",name:{fa:"فرانسه",en:"France"},desc:{fa:"عضو دائمی شورای امنیت با اقتصاد متنوع.",en:"Permanent UNSC member with a diversified economy."},region:"west",government:{fa:"جمهوری",en:"Republic"},religion:"secular",era:"modern",population:68000000,resources:{diamonds:3,gold:6,oil:8,iron:14,coal:8,uranium:6}},
+  {id:"gb",flag:"🇬🇧",name:{fa:"بریتانیا",en:"United Kingdom"},desc:{fa:"قدرت مالی و دریایی سنتی.",en:"A traditional financial and maritime power."},region:"west",government:{fa:"پادشاهی مشروطه",en:"Constitutional Monarchy"},religion:"christianity_protestant",era:"modern",population:67000000,resources:{diamonds:3,gold:5,oil:14,iron:12,coal:16,uranium:3}},
+  {id:"in",flag:"🇮🇳",name:{fa:"هند",en:"India"},desc:{fa:"پرجمیعت‌ترین کشور جهان.",en:"The world's most populous country."},region:"east",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"hinduism",era:"modern",population:1428000000,resources:{diamonds:4,gold:10,oil:10,iron:35,coal:50,uranium:3}},
+  {id:"br",flag:"🇧🇷",name:{fa:"برزیل",en:"Brazil"},desc:{fa:"بزرگ‌ترین اقتصاد آمریکای جنوبی.",en:"South America's largest economy."},region:"west",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"christianity_catholic",era:"modern",population:216000000,resources:{diamonds:6,gold:12,oil:22,iron:38,coal:6,uranium:5}},
+  {id:"tr",flag:"🇹🇷",name:{fa:"ترکیه",en:"Türkiye"},desc:{fa:"پل میان اروپا و آسیا.",en:"A bridge between Europe and Asia."},region:"west",government:{fa:"جمهوری",en:"Republic"},religion:"islam_sunni",era:"modern",population:85000000,resources:{diamonds:1,gold:4,oil:4,iron:16,coal:14,uranium:2}},
+  {id:"sa",flag:"🇸🇦",name:{fa:"عربستان سعودی",en:"Saudi Arabia"},desc:{fa:"ذخایر عظیم نفت و گاز.",en:"Massive oil and gas reserves."},region:"south",government:{fa:"پادشاهی",en:"Kingdom"},religion:"islam_sunni",era:"modern",population:36000000,resources:{diamonds:8,gold:12,oil:95,iron:6,coal:2,uranium:1}},
+  {id:"eg",flag:"🇪🇬",name:{fa:"مصر",en:"Egypt"},desc:{fa:"قدرت منطقه‌ای شمال آفریقا.",en:"A North African regional power."},region:"south",government:{fa:"جمهوری",en:"Republic"},religion:"islam_sunni",era:"modern",population:105000000,resources:{diamonds:2,gold:8,oil:8,iron:10,coal:4,uranium:1}},
+  {id:"jp",flag:"🇯🇵",name:{fa:"ژاپن",en:"Japan"},desc:{fa:"قدرت فناوری و صنعتی آسیا.",en:"Asia's technology power."},region:"east",government:{fa:"پادشاهی مشروطه",en:"Constitutional Monarchy"},religion:"shinto",era:"modern",population:124000000,resources:{diamonds:1,gold:3,oil:2,iron:6,coal:4,uranium:1}},
+  {id:"kr",flag:"🇰🇷",name:{fa:"کره جنوبی",en:"South Korea"},desc:{fa:"اقتصاد پیشرفته با صادرات فناوری.",en:"Advanced economy with tech exports."},region:"east",government:{fa:"جمهوری",en:"Republic"},religion:"mixed",era:"modern",population:52000000,resources:{diamonds:1,gold:2,oil:2,iron:8,coal:3,uranium:1}},
+  {id:"it",flag:"🇮🇹",name:{fa:"ایتالیا",en:"Italy"},desc:{fa:"عضو بنیان‌گذار اتحادیه اروپا.",en:"A founding member of the EU."},region:"west",government:{fa:"جمهوری",en:"Republic"},religion:"christianity_catholic",era:"modern",population:59000000,resources:{diamonds:2,gold:3,oil:4,iron:8,coal:4,uranium:1}},
+  {id:"es",flag:"🇪🇸",name:{fa:"اسپانیا",en:"Spain"},desc:{fa:"چهارمین اقتصاد بزرگ منطقه یورو.",en:"The fourth-largest Eurozone economy."},region:"west",government:{fa:"پادشاهی مشروطه",en:"Constitutional Monarchy"},religion:"christianity_catholic",era:"modern",population:47000000,resources:{diamonds:1,gold:3,oil:3,iron:6,coal:4,uranium:1}},
+  {id:"ca",flag:"🇨🇦",name:{fa:"کانادا",en:"Canada"},desc:{fa:"منابع طبیعی فراوان.",en:"Abundant natural resources."},region:"west",government:{fa:"فدراسیون",en:"Federation"},religion:"secular",era:"modern",population:39000000,resources:{diamonds:6,gold:10,oil:30,iron:22,coal:18,uranium:14}},
+  {id:"au",flag:"🇦🇺",name:{fa:"استرالیا",en:"Australia"},desc:{fa:"صادرکننده بزرگ مواد معدنی.",en:"A major mineral exporter."},region:"east",government:{fa:"فدراسیون",en:"Federation"},religion:"secular",era:"modern",population:26000000,resources:{diamonds:10,gold:14,oil:10,iron:40,coal:28,uranium:16}},
+  {id:"mx",flag:"🇲🇽",name:{fa:"مکزیک",en:"Mexico"},desc:{fa:"اقتصاد بزرگ آمریکای لاتین.",en:"A large Latin American economy."},region:"west",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"christianity_catholic",era:"modern",population:128000000,resources:{diamonds:2,gold:6,oil:14,iron:10,coal:6,uranium:2}},
+  {id:"pk",flag:"🇵🇰",name:{fa:"پاکستان",en:"Pakistan"},desc:{fa:"کشور جنوب آسیا با جمعیت جوان.",en:"A South Asian country with a young population."},region:"east",government:{fa:"جمهوری",en:"Republic"},religion:"islam_sunni",era:"modern",population:240000000,resources:{diamonds:1,gold:3,oil:3,iron:10,coal:8,uranium:2}},
+  {id:"id",flag:"🇮🇩",name:{fa:"اندونزی",en:"Indonesia"},desc:{fa:"بزرگ‌ترین اقتصاد جنوب شرق آسیا.",en:"Southeast Asia's largest economy."},region:"east",government:{fa:"جمهوری",en:"Republic"},religion:"islam_sunni",era:"modern",population:275000000,resources:{diamonds:2,gold:8,oil:8,iron:14,coal:20,uranium:2}},
+  {id:"ng",flag:"🇳🇬",name:{fa:"نیجریه",en:"Nigeria"},desc:{fa:"بزرگ‌ترین اقتصاد آفریقا.",en:"Africa's largest economy."},region:"south",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"mixed",era:"modern",population:220000000,resources:{diamonds:2,gold:4,oil:24,iron:8,coal:4,uranium:1}},
+  {id:"za",flag:"🇿🇦",name:{fa:"آفریقای جنوبی",en:"South Africa"},desc:{fa:"ذخایر الماس و طلا.",en:"Diamond and gold reserves."},region:"south",government:{fa:"جمهوری",en:"Republic"},religion:"mixed",era:"modern",population:60000000,resources:{diamonds:18,gold:20,oil:2,iron:20,coal:22,uranium:6}},
+  {id:"ar",flag:"🇦🇷",name:{fa:"آرژانتین",en:"Argentina"},desc:{fa:"کشور کشاورزی و دامی آمریکای جنوبی.",en:"A South American agricultural nation."},region:"west",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"christianity_catholic",era:"modern",population:46000000,resources:{diamonds:2,gold:5,oil:8,iron:10,coal:2,uranium:3}},
+  {id:"pl",flag:"🇵🇱",name:{fa:"لهستان",en:"Poland"},desc:{fa:"اقتصاد در حال رشد اروپای مرکزی.",en:"A growing Central European economy."},region:"north",government:{fa:"جمهوری",en:"Republic"},religion:"christianity_catholic",era:"modern",population:38000000,resources:{diamonds:1,gold:2,oil:2,iron:8,coal:16,uranium:1}},
+  {id:"ua",flag:"🇺🇦",name:{fa:"اوکراین",en:"Ukraine"},desc:{fa:"کشور کشاورزی و صنعتی شرق اروپا.",en:"An agricultural and industrial state."},region:"north",government:{fa:"جمهوری",en:"Republic"},religion:"christianity_orthodox",era:"modern",population:43000000,resources:{diamonds:1,gold:3,oil:2,iron:20,coal:14,uranium:3}},
+  {id:"il",flag:"🇮🇱",name:{fa:"اسرائیل",en:"Israel"},desc:{fa:"قدرت فناوری خاورمیانه.",en:"A Middle Eastern technology power."},region:"west",government:{fa:"جمهوری پارلمانی",en:"Parliamentary Republic"},religion:"judaism",era:"modern",population:9700000,resources:{diamonds:1,gold:2,oil:3,iron:3,coal:2,uranium:1}},
+  {id:"iq",flag:"🇮🇶",name:{fa:"عراق",en:"Iraq"},desc:{fa:"تاریخ کهن بین‌النهرین و ذخایر نفت.",en:"Ancient Mesopotamian heritage and oil reserves."},region:"west",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"islam_shia",era:"modern",population:43000000,resources:{diamonds:2,gold:5,oil:48,iron:8,coal:2,uranium:1}},
+  {id:"sy",flag:"🇸🇾",name:{fa:"سوریه",en:"Syria"},desc:{fa:"کشور خاورمیانه با تاریخ کهن.",en:"A Middle Eastern country with ancient history."},region:"west",government:{fa:"جمهوری",en:"Republic"},religion:"islam_sunni",era:"modern",population:21000000,resources:{diamonds:1,gold:3,oil:10,iron:6,coal:2,uranium:1}},
+  {id:"af",flag:"🇦🇫",name:{fa:"افغانستان",en:"Afghanistan"},desc:{fa:"کشور کوهستانی جنوب آسیا.",en:"A mountainous South Asian country."},region:"east",government:{fa:"امارت اسلامی",en:"Islamic Emirate"},religion:"islam_sunni",era:"modern",population:41000000,resources:{diamonds:3,gold:4,oil:2,iron:8,coal:4,uranium:1}},
+  {id:"kp",flag:"🇰🇵",name:{fa:"کره شمالی",en:"North Korea"},desc:{fa:"کشور منزوی با برنامه نظامی.",en:"An isolated state with a military program."},region:"east",government:{fa:"جمهوری سوسیالیستی",en:"Socialist Republic"},religion:"state_atheism",era:"modern",population:26000000,resources:{diamonds:1,gold:3,oil:1,iron:12,coal:14,uranium:4}},
+  {id:"vn",flag:"🇻🇳",name:{fa:"ویتنام",en:"Vietnam"},desc:{fa:"اقتصاد در حال رشد جنوب شرق آسیا.",en:"A growing Southeast Asian economy."},region:"east",government:{fa:"جمهوری سوسیالیستی",en:"Socialist Republic"},religion:"mixed",era:"modern",population:98000000,resources:{diamonds:2,gold:4,oil:8,iron:12,coal:16,uranium:2}},
+  {id:"th",flag:"🇹🇭",name:{fa:"تایلند",en:"Thailand"},desc:{fa:"قدرت گردشگری و کشاورزی.",en:"A tourism and agricultural power."},region:"east",government:{fa:"پادشاهی مشروطه",en:"Constitutional Monarchy"},religion:"buddhism",era:"modern",population:71000000,resources:{diamonds:1,gold:3,oil:4,iron:8,coal:4,uranium:1}},
+  {id:"my",flag:"🇲🇾",name:{fa:"مالزی",en:"Malaysia"},desc:{fa:"اقتصاد نوظهور جنوب شرق آسیا.",en:"An emerging Southeast Asian economy."},region:"east",government:{fa:"پادشاهی فدرال",en:"Federal Monarchy"},religion:"islam_sunni",era:"modern",population:33000000,resources:{diamonds:2,gold:4,oil:10,iron:8,coal:6,uranium:1}},
+  {id:"ph",flag:"🇵🇭",name:{fa:"فیلیپین",en:"Philippines"},desc:{fa:"مجمع‌الجزایر جنوب شرق آسیا.",en:"A Southeast Asian archipelago."},region:"east",government:{fa:"جمهوری",en:"Republic"},religion:"christianity_catholic",era:"modern",population:115000000,resources:{diamonds:1,gold:5,oil:3,iron:6,coal:4,uranium:1}},
+  {id:"gr",flag:"🇬🇷",name:{fa:"یونان",en:"Greece"},desc:{fa:"مهد تمدن غرب.",en:"The cradle of Western civilization."},region:"west",government:{fa:"جمهوری",en:"Republic"},religion:"christianity_orthodox",era:"modern",population:10000000,resources:{diamonds:1,gold:2,oil:2,iron:4,coal:8,uranium:1}},
+  {id:"se",flag:"🇸🇪",name:{fa:"سوئد",en:"Sweden"},desc:{fa:"اقتصاد پیشرفته اسکاندیناوی.",en:"An advanced Nordic economy."},region:"north",government:{fa:"پادشاهی مشروطه",en:"Constitutional Monarchy"},religion:"secular",era:"modern",population:10500000,resources:{diamonds:1,gold:2,oil:1,iron:10,coal:2,uranium:2}},
+  {id:"no",flag:"🇳🇴",name:{fa:"نروژ",en:"Norway"},desc:{fa:"صادرکننده نفت و گاز.",en:"An oil and gas exporter."},region:"north",government:{fa:"پادشاهی مشروطه",en:"Constitutional Monarchy"},religion:"christianity_protestant",era:"modern",population:5500000,resources:{diamonds:1,gold:2,oil:35,iron:8,coal:4,uranium:2}},
+  {id:"ch",flag:"🇨🇭",name:{fa:"سوئیس",en:"Switzerland"},desc:{fa:"مرکز مالی جهان.",en:"A global financial center."},region:"west",government:{fa:"فدراسیون",en:"Federation"},religion:"christianity_catholic",era:"modern",population:8900000,resources:{diamonds:1,gold:10,oil:1,iron:3,coal:1,uranium:1}},
+  {id:"nl",flag:"🇳🇱",name:{fa:"هلند",en:"Netherlands"},desc:{fa:"اقتصاد باز و تجارت جهانی.",en:"An open economy and global trade."},region:"west",government:{fa:"پادشاهی مشروطه",en:"Constitutional Monarchy"},religion:"secular",era:"modern",population:17800000,resources:{diamonds:1,gold:2,oil:2,iron:4,coal:2,uranium:1}},
+  {id:"be",flag:"🇧🇪",name:{fa:"بلژیک",en:"Belgium"},desc:{fa:"مقر اتحادیه اروپا.",en:"Home of the European Union."},region:"west",government:{fa:"پادشاهی فدرال",en:"Federal Monarchy"},religion:"christianity_catholic",era:"modern",population:11500000,resources:{diamonds:1,gold:1,oil:1,iron:3,coal:2,uranium:1}},
+  {id:"pt",flag:"🇵🇹",name:{fa:"پرتغال",en:"Portugal"},desc:{fa:"میراث استعماری و اقیانوس‌پیما.",en:"Colonial heritage and maritime history."},region:"west",government:{fa:"جمهوری",en:"Republic"},religion:"christianity_catholic",era:"modern",population:10300000,resources:{diamonds:1,gold:2,oil:1,iron:3,coal:1,uranium:1}},
+  {id:"at",flag:"🇦🇹",name:{fa:"اتریش",en:"Austria"},desc:{fa:"قلب سابق امپراتوری هابسبورگ.",en:"Heart of the former Habsburg Empire."},region:"west",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"christianity_catholic",era:"modern",population:9000000,resources:{diamonds:1,gold:2,oil:1,iron:4,coal:2,uranium:1}},
+  {id:"cz",flag:"🇨🇿",name:{fa:"جمهوری چک",en:"Czech Republic"},desc:{fa:"اقتصاد صنعتی اروپای مرکزی.",en:"A Central European industrial economy."},region:"north",government:{fa:"جمهوری",en:"Republic"},religion:"secular",era:"modern",population:10800000,resources:{diamonds:1,gold:1,oil:1,iron:5,coal:10,uranium:2}},
+  {id:"ro",flag:"🇷🇴",name:{fa:"رومانی",en:"Romania"},desc:{fa:"کشور اروپای شرقی با منابع طبیعی.",en:"An Eastern European country with natural resources."},region:"north",government:{fa:"جمهوری",en:"Republic"},religion:"christianity_orthodox",era:"modern",population:19000000,resources:{diamonds:1,gold:3,oil:6,iron:8,coal:6,uranium:2}},
+  {id:"hu",flag:"🇭🇺",name:{fa:"مجارستان",en:"Hungary"},desc:{fa:"میراث امپراتوری اتریش-مجارستان.",en:"Heir to the Austro-Hungarian legacy."},region:"north",government:{fa:"جمهوری پارلمانی",en:"Parliamentary Republic"},religion:"christianity_catholic",era:"modern",population:9700000,resources:{diamonds:1,gold:2,oil:2,iron:4,coal:4,uranium:1}},
+  {id:"ma",flag:"🇲🇦",name:{fa:"مراکش",en:"Morocco"},desc:{fa:"پادشاهی شمال آفریقا.",en:"A North African kingdom."},region:"south",government:{fa:"پادشاهی",en:"Kingdom"},religion:"islam_sunni",era:"modern",population:37000000,resources:{diamonds:1,gold:3,oil:2,iron:6,coal:2,uranium:1}},
+  {id:"dz",flag:"🇩🇿",name:{fa:"الجزایر",en:"Algeria"},desc:{fa:"بزرگ‌ترین کشور آفریقا.",en:"Africa's largest country by area."},region:"south",government:{fa:"جمهوری",en:"Republic"},religion:"islam_sunni",era:"modern",population:44000000,resources:{diamonds:2,gold:4,oil:24,iron:10,coal:4,uranium:2}},
+  {id:"et",flag:"🇪🇹",name:{fa:"اتیوپی",en:"Ethiopia"},desc:{fa:"یکی از کهن‌ترین کشورهای آفریقا.",en:"One of Africa's oldest nations."},region:"south",government:{fa:"جمهوری فدرال",en:"Federal Republic"},religion:"christianity_orthodox",era:"modern",population:120000000,resources:{diamonds:2,gold:6,oil:2,iron:10,coal:4,uranium:2}},
+  {id:"ke",flag:"🇰🇪",name:{fa:"کنیا",en:"Kenya"},desc:{fa:"قدرت اقتصادی شرق آفریقا.",en:"East Africa's economic power."},region:"south",government:{fa:"جمهوری",en:"Republic"},religion:"christianity_protestant",era:"modern",population:55000000,resources:{diamonds:1,gold:3,oil:1,iron:4,coal:2,uranium:1}},
+
+  /* ===== HISTORICAL EMPIRES (with note) ===== */
+  {id:"achaemenid",flag:"🏛️",name:{fa:"شاهنشاهی هخامنشی",en:"Achaemenid Empire"},desc:{fa:"(۵۵۰–۳۳۰ ق.م) نخستین امپراتوری بزرگ ایرانی.",en:"(550–330 BC) The first great Persian empire."},region:"west",government:{fa:"شاهنشاهی",en:"Monarchy"},religion:"zoroastrianism",era:"historical",population:50000000,resources:{diamonds:14,gold:24,oil:8,iron:24,coal:8,uranium:1}},
+  {id:"sassanid",flag:"🔥",name:{fa:"شاهنشاهی ساسانی",en:"Sassanid Empire"},desc:{fa:"(۲۲۴–۶۵۱ م) آخرین امپراتوری پیش از اسلام ایران.",en:"(224–651 AD) The last pre-Islamic Persian empire."},region:"west",government:{fa:"شاهنشاهی",en:"Monarchy"},religion:"zoroastrianism",era:"historical",population:25000000,resources:{diamonds:12,gold:20,oil:12,iron:22,coal:10,uranium:1}},
+  {id:"pahlavi",flag:"👑",name:{fa:"ایران پهلوی",en:"Pahlavi Iran"},desc:{fa:"(۱۹۲۵–۱۹۷۹) پادشاهی مشروطه با مدرن‌سازی شتابان.",en:"(1925–1979) A constitutional monarchy with rapid modernization."},region:"west",government:{fa:"پادشاهی مشروطه",en:"Constitutional Monarchy"},religion:"islam_shia",era:"historical",population:35000000,resources:{diamonds:6,gold:12,oil:60,iron:18,coal:12,uranium:4}},
+  {id:"nazi_germany",flag:"🏴",name:{fa:"رایش آلمان",en:"German Reich"},desc:{fa:"(۱۹۳۳–۱۹۴۵) رژیم توتالیتر با سیاست توسعه‌طلبانه؛ موضوع تاریخی جنگ جهانی دوم.",en:"(1933–1945) A totalitarian regime with expansionist policy; historical subject of WWII."},region:"west",government:{fa:"توتالیتر",en:"Totalitarian"},religion:"mixed",era:"historical",population:79000000,resources:{diamonds:4,gold:8,oil:18,iron:30,coal:34,uranium:3}},
+  {id:"ussr",flag:"🚩",name:{fa:"اتحاد جماهیر شوروی",en:"Soviet Union"},desc:{fa:"(۱۹۲۲–۱۹۹۱) ابرقدرت سوسیالیستی دوران جنگ سرد.",en:"(1922–1991) The socialist superpower of the Cold War."},region:"north",government:{fa:"فدراسیون سوسیالیستی",en:"Socialist Federation"},religion:"state_atheism",era:"historical",population:290000000,resources:{diamonds:16,gold:22,oil:80,iron:40,coal:55,uranium:14}},
+  {id:"rome",flag:"🦅",name:{fa:"امپراتوری روم",en:"Roman Empire"},desc:{fa:"(۲۷ ق.م–۴۷۶ م) امپراتوری مدیترانه‌ای با نفوذ جهانی.",en:"(27 BC–476 AD) A Mediterranean empire with global influence."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"roman_polytheism",era:"historical",population:60000000,resources:{diamonds:6,gold:18,oil:8,iron:24,coal:12,uranium:1}},
+  {id:"byzantium",flag:"☦️",name:{fa:"امپراتوری بیزانس",en:"Byzantine Empire"},desc:{fa:"(۳۳۰–۱۴۵۳) وارث روم شرقی با میراث مسیحی.",en:"(330–1453) The Eastern Roman heir with Christian heritage."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"christianity_orthodox",era:"historical",population:20000000,resources:{diamonds:4,gold:12,oil:6,iron:16,coal:8,uranium:1}},
+  {id:"ottoman",flag:"🌙",name:{fa:"امپراتوری عثمانی",en:"Ottoman Empire"},desc:{fa:"(۱۲۹۹–۱۹۲۲) امپراتوری چندقومیتی خاورمیانه و بالکان.",en:"(1299–1922) A multi-ethnic Middle Eastern and Balkan empire."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"islam_sunni",era:"historical",population:30000000,resources:{diamonds:6,gold:14,oil:20,iron:18,coal:10,uranium:2}},
+  {id:"mongol",flag:"🏹",name:{fa:"امپراتوری مغول",en:"Mongol Empire"},desc:{fa:"(۱۲۰۶–۱۳۶۸) بزرگ‌ترین امپراتوری پیوسته تاریخ.",en:"(1206–1368) The largest contiguous empire in history."},region:"east",government:{fa:"خانات",en:"Khanate"},religion:"tengrism",era:"historical",population:100000000,resources:{diamonds:8,gold:16,oil:6,iron:22,coal:8,uranium:1}},
+  {id:"british_empire",flag:"👑",name:{fa:"امپراتوری بریتانیا",en:"British Empire"},desc:{fa:"(اوج ۱۹۲۰) بزرگ‌ترین امپراتوری استعماری تاریخ.",en:"(peak 1920) The largest colonial empire in history."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"christianity_protestant",era:"historical",population:500000000,resources:{diamonds:20,gold:30,oil:45,iron:40,coal:55,uranium:8}},
+  {id:"spanish_empire",flag:"🏰",name:{fa:"امپراتوری اسپانیا",en:"Spanish Empire"},desc:{fa:"(۱۴۹۲–۱۹۷۶) امپراتوری جهانی در آمریکا و آسیا.",en:"(1492–1976) A global empire across the Americas and Asia."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"christianity_catholic",era:"historical",population:60000000,resources:{diamonds:16,gold:24,oil:10,iron:20,coal:6,uranium:2}},
+  {id:"napoleonic_france",flag:"🦅",name:{fa:"امپراتوری اول فرانسه",en:"First French Empire"},desc:{fa:"(۱۸۰۴–۱۸۱۵) امپراتوری ناپلئون بناپارت.",en:"(1804–1815) Napoleon Bonaparte's empire."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"christianity_catholic",era:"historical",population:45000000,resources:{diamonds:4,gold:12,oil:4,iron:22,coal:14,uranium:2}},
+  {id:"japanese_empire",flag:"🗾",name:{fa:"امپراتوری ژاپن",en:"Empire of Japan"},desc:{fa:"(۱۸۶۸–۱۹۴۷) قدرت صنعتی و نظامی آسیای شرقی.",en:"(1868–1947) The industrial and military power of East Asia."},region:"east",government:{fa:"امپراتوری",en:"Empire"},religion:"shinto",era:"historical",population:70000000,resources:{diamonds:2,gold:6,oil:8,iron:14,coal:20,uranium:2}},
+  {id:"mughal",flag:"🕌",name:{fa:"امپراتوری گورکانی",en:"Mughal Empire"},desc:{fa:"(۱۵۲۶–۱۸۵۷) امپراتوری مسلمان شبه‌قاره هند.",en:"(1526–1857) The Muslim empire of the Indian subcontinent."},region:"east",government:{fa:"امپراتوری",en:"Empire"},religion:"islam_sunni",era:"historical",population:150000000,resources:{diamonds:18,gold:24,oil:6,iron:18,coal:8,uranium:1}},
+  {id:"qing",flag:"🐉",name:{fa:"دودمان چینگ",en:"Qing Dynasty"},desc:{fa:"(۱۶۴۴–۱۹۱۲) آخرین دودمان امپراتوری چین.",en:"(1644–1912) The last imperial dynasty of China."},region:"east",government:{fa:"دودمان",en:"Dynasty"},religion:"mixed",era:"historical",population:400000000,resources:{diamonds:8,gold:18,oil:10,iron:35,coal:50,uranium:2}},
+  {id:"aztec",flag:"🌞",name:{fa:"امپراتوری آزتک",en:"Aztec Empire"},desc:{fa:"(۱۴۲۸–۱۵۲۱) امپراتوری مکزیک پیش از کلمبیا.",en:"(1428–1521) A pre-Columbian Mesoamerican empire."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"aztec_polytheism",era:"historical",population:5000000,resources:{diamonds:4,gold:14,oil:2,iron:6,coal:2,uranium:1}},
+  {id:"inca",flag:"🌄",name:{fa:"امپراتوری اینکا",en:"Inca Empire"},desc:{fa:"(۱۴۳۸–۱۵۳۳) بزرگ‌ترین امپراتوری آمریکای پیش از کلمبیا.",en:"(1438–1533) The largest pre-Columbian American empire."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"inca_religion",era:"historical",population:10000000,resources:{diamonds:6,gold:20,oil:2,iron:8,coal:4,uranium:2}},
+  {id:"macedon",flag:"⚔️",name:{fa:"امپراتوری مقدونیه",en:"Macedonian Empire"},desc:{fa:"(۳۳۶–۳۲۳ ق.م) امپراتوری اسکندر مقدونی.",en:"(336–323 BC) Alexander the Great's empire."},region:"west",government:{fa:"پادشاهی",en:"Kingdom"},religion:"greek_polytheism",era:"historical",population:20000000,resources:{diamonds:4,gold:16,oil:4,iron:16,coal:4,uranium:1}},
+  {id:"egypt_ancient",flag:"🐈",name:{fa:"مصر باستان (پادشاهی نوین)",en:"Ancient Egypt (New Kingdom)"},desc:{fa:"(۱۵۵۰–۱۰۷۷ ق.م) تمدن کهن دره نیل.",en:"(1550–1077 BC) The ancient civilization of the Nile Valley."},region:"south",government:{fa:"پادشاهی",en:"Kingdom"},religion:"egyptian_polytheism",era:"historical",population:4000000,resources:{diamonds:2,gold:24,oil:1,iron:4,coal:1,uranium:1}},
+  {id:"babylon",flag:"🏛️",name:{fa:"امپراتوری بابل",en:"Babylonian Empire"},desc:{fa:"(۱۸۹۴–۵۳۹ ق.م) تمدن بین‌النهرین با قانون حمورابی.",en:"(1894–539 BC) The Mesopotamian civilization of Hammurabi's Code."},region:"west",government:{fa:"پادشاهی",en:"Kingdom"},religion:"babylonian_polytheism",era:"historical",population:5000000,resources:{diamonds:2,gold:12,oil:4,iron:6,coal:2,uranium:1}},
+  {id:"assyria",flag:"🦁",name:{fa:"امپراتوری آشور",en:"Assyrian Empire"},desc:{fa:"(۹۱۱–۶۰۹ ق.م) امپراتوری نظامی بین‌النهرین.",en:"(911–609 BC) The military empire of Mesopotamia."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"mesopotamian_polytheism",era:"historical",population:4000000,resources:{diamonds:1,gold:10,oil:4,iron:10,coal:2,uranium:1}},
+  {id:"carthage",flag:"⚓",name:{fa:"کارتاژ",en:"Carthage"},desc:{fa:"(۸۱۴–۱۴۶ ق.م) قدرت دریایی مدیترانه غربی.",en:"(814–146 BC) The naval power of the western Mediterranean."},region:"west",government:{fa:"جمهوری الیگارشی",en:"Oligarchic Republic"},religion:"punic_polytheism",era:"historical",population:3000000,resources:{diamonds:2,gold:8,oil:2,iron:6,coal:1,uranium:1}},
+  {id:"hre",flag:"🏰",name:{fa:"امپراتوری مقدس روم",en:"Holy Roman Empire"},desc:{fa:"(۸۰۰–۱۸۰۶) کنفدراسیون پیچیده اروپای مرکزی.",en:"(800–1806) A complex Central European confederation."},region:"west",government:{fa:"امپراتوری",en:"Empire"},religion:"christianity_catholic",era:"historical",population:25000000,resources:{diamonds:2,gold:8,oil:4,iron:18,coal:12,uranium:1}},
+  {id:"russian_empire",flag:"👑",name:{fa:"امپراتوری روسیه",en:"Russian Empire"},desc:{fa:"(۱۷۲۱–۱۹۱۷) یکی از بزرگ‌ترین امپراتوری‌های تاریخ.",en:"(1721–1917) One of the largest empires in history."},region:"north",government:{fa:"امپراتوری",en:"Empire"},religion:"christianity_orthodox",era:"historical",population:150000000,resources:{diamonds:12,gold:20,oil:40,iron:35,coal:40,uranium:6}},
+  {id:"austro_hungarian",flag:"🦅",name:{fa:"امپراتوری اتریش-مجارستان",en:"Austro-Hungarian Empire"},desc:{fa:"(۱۸۶۷–۱۹۱۸) امپراتوری دوگانه اروپای مرکزی.",en:"(1867–1918) The dual monarchy of Central Europe."},region:"west",government:{fa:"پادشاهی دوگانه",en:"Dual Monarchy"},religion:"christianity_catholic",era:"historical",population:50000000,resources:{diamonds:2,gold:8,oil:6,iron:16,coal:20,uranium:2}}
+];
+
+const ALLIANCES = [
+  { id:"nato",  color:"#42D9FF", name:{fa:"ناتو",en:"NATO"} },
+  { id:"brics", color:"#F5A623", name:{fa:"بریکس",en:"BRICS"} },
+  { id:"eu",    color:"#8B7CFF", name:{fa:"اتحادیه اروپا",en:"European Union"} },
+  { id:"sco",   color:"#34D399", name:{fa:"سازمان همکاری شانگهای",en:"Shanghai Cooperation Organization"} },
+  { id:"opec",  color:"#EF4444", name:{fa:"اوپک",en:"OPEC"} },
+  { id:"g7",    color:"#E5E7EB", name:{fa:"گروه هفت",en:"G7"} }
+];
+const COUNTRY_ALLIANCES = {
+  us:["nato","g7"], gb:["nato","g7"], fr:["nato","eu","g7"], de:["nato","eu","g7"],
+  it:["nato","eu","g7"], es:["nato","eu"], ca:["nato","g7"], pl:["nato","eu"],
+  jp:["g7"], ru:["brics","sco"], cn:["brics","sco"], in:["brics","sco"],
+  br:["brics"], za:["brics"], ir:["sco","opec"], sa:["opec"], ng:["opec"],
+  eg:["brics","opec"], tr:["nato"], pk:["sco"], id:["brics"], ar:["brics"],
+  au:[], kr:[], mx:[], ua:[], il:[], iq:[], sy:[], af:[], kp:[], vn:[],
+  th:[], my:[], ph:[], gr:["nato","eu"], se:["eu"], no:["nato"], ch:[],
+  nl:["nato","eu"], be:["nato","eu"], pt:["nato","eu"], at:["eu"],
+  cz:["nato","eu"], ro:["nato","eu"], hu:["nato","eu"], ma:[], dz:["opec"],
+  et:[], ke:[]
+};
+
+const MINES = [
+  { id:"m-dia", resource:"diamonds", name:{fa:"معدن الماس",en:"Diamond Mine"}, price:200000, dailyIncome:14000, maintenance:2000 },
+  { id:"m-gold",resource:"gold",     name:{fa:"معدن طلا",en:"Gold Mine"},     price:180000, dailyIncome:12000, maintenance:1800 },
+  { id:"m-oil", resource:"oil",      name:{fa:"چاه نفت",en:"Oil Well"},        price:260000, dailyIncome:18000, maintenance:3000 },
+  { id:"m-iron",resource:"iron",     name:{fa:"معدن آهن",en:"Iron Mine"},      price:140000, dailyIncome:9000,  maintenance:1200 },
+  { id:"m-coal",resource:"coal",     name:{fa:"معدن زغال‌سنگ",en:"Coal Mine"}, price:120000, dailyIncome:8000,  maintenance:1000 },
+  { id:"m-uran",resource:"uranium",  name:{fa:"معدن اورانیوم",en:"Uranium Mine"},price:400000, dailyIncome:24000, maintenance:5000 }
+];
+const PRODUCTS = [
+  { id:"p-tank",    category:"military", name:{fa:"گردان تانک",en:"Tank Battalion"},        price:150000, icon:"🛡️", upkeep:1500 },
+  { id:"p-jet",     category:"military", name:{fa:"اسکادران جنگنده",en:"Fighter Squadron"}, price:220000, icon:"✈️", upkeep:2500 },
+  { id:"p-radar",   category:"defense",  name:{fa:"شبکه رادار",en:"Radar Network"},        price:90000,  icon:"📡", upkeep:800 },
+  { id:"p-shelter", category:"defense",  name:{fa:"پناهگاه شهری",en:"Urban Shelters"},       price:120000, icon:"🏗️", upkeep:600 },
+  { id:"p-school",  category:"public",   name:{fa:"مدارس دولتی",en:"Public Schools"},        price:100000, icon:"🏫", upkeep:900 },
+  { id:"p-hosp",    category:"public",   name:{fa:"بیمارستان تخصصی",en:"Specialist Hospitals"},price:130000,icon:"🏥", upkeep:1100 },
+  { id:"p-lab",     category:"research", name:{fa:"آزمایشگاه ملی",en:"National Laboratory"}, price:160000, icon:"🔬", upkeep:1400 },
+  { id:"p-flag",    category:"cosmetic", name:{fa:"پرچم تشریفاتی",en:"Ceremonial Banner"},   price:20000,  icon:"🎗️", upkeep:0 }
+];
+const RES_META = {
+  diamonds:{fa:"الماس",en:"Diamonds",icon:"💎"},
+  gold:{fa:"طلا",en:"Gold",icon:"🥇"},
+  oil:{fa:"نفت",en:"Oil",icon:"🛢️"},
+  iron:{fa:"آهن",en:"Iron",icon:"⛓️"},
+  coal:{fa:"زغال‌سنگ",en:"Coal",icon:"🪨"},
+  uranium:{fa:"اورانیوم",en:"Uranium",icon:"☢️"}
+};
+const RESOLUTIONS = [
+  { id:"r1", title:{fa:"قطعنامه ۱: آتش‌بس منطقه‌ای",en:"Resolution 1: Regional Ceasefire"},
+    summary:{fa:"دعوت از اعضا برای کاهش تنش‌ها.",en:"Calls on members to reduce tensions."},
+    deadline: Date.now()+1000*60*60*48, status:"open" },
+  { id:"r2", title:{fa:"قطعنامه ۲: شفافیت تجاری",en:"Resolution 2: Trade Transparency"},
+    summary:{fa:"افزایش شفافیت قراردادهای تجاری.",en:"Increase trade contract transparency."},
+    deadline: Date.now()+1000*60*60*120, status:"open" }
+];
+
+/* ---------- Translations ---------- */
+const T = {
+  fa: {
+    appName:"GAME OF THE WITCHER", demo:"حالت نمایشی",
+    demoWarn:"این یک نمایش است. داده‌ها فقط در مرورگر ذخیره می‌شوند و امن نیستند.",
+    login:"ورود", register:"ثبت‌نام", username:"نام کاربری", password:"گذرواژه",
+    loginTitle:"ورود به GAME OF THE WITCHER", registerTitle:"ایجاد حساب در GAME OF THE WITCHER",
+    submitLogin:"ورود", submitRegister:"ثبت‌نام", logout:"خروج",
+    authRequired:"نام کاربری و گذرواژه لازم است.", authWeak:"گذرواژه حداقل ۴ نویسه.",
+    authExists:"این نام کاربری قبلاً ثبت شده است.", authBad:"نام کاربری یا گذرواژه نامعتبر.",
+    authOk:"خوش آمدید!", authCreated:"حساب ساخته شد.",
+    chooseCountry:"کشور خود را انتخاب کنید",
+    chooseCountryHint:"هر کشور تنها توسط یک کاربر قابل انتخاب است.",
+    filterAll:"همه", filterModern:"مدرن", filterHistorical:"تاریخی",
+    claimedBy:"تصرف‌شده توسط", claim:"انتخاب", claimed:"متعلق به شما",
+    countryLocked:"این کشور قبلاً انتخاب شده است.", countryClaimed:"کشور شما ثبت شد.",
+    continue:"ادامه", back:"بازگشت",
+    nav_overview:"نمای کلی", nav_country:"کشور من", nav_economy:"اقتصاد", nav_market:"بازار",
+    nav_social:"شبکه اجتماعی", nav_diplomacy:"دیپلماسی", nav_council:"شورای جهانی",
+    nav_alliances:"اتحادها", nav_ai:"هوش مصنوعی", nav_notifications:"اعلان‌ها",
+    nav_settings:"تنظیمات", nav_admin:"مدیریت نمایشی",
+    treasury:"خزانه", approval:"رضایت عمومی", population:"جمعیت", readiness:"آمادگی",
+    research:"پژوهش", religion:"دین", era:"دوره",
+    runPayout:"پرداخت روزانه", lastPayout:"آخرین پرداخت",
+    never:"هرگز", todayDone:"امروز پرداخت شده", payoutOk:"پرداخت روزانه انجام شد.",
+    noMines:"هیچ معدنی ندارید.", buyMine:"خرید معدن", income:"درآمد", maint:"نگهداری",
+    insufficient:"موجودی کافی نیست.", alreadyOwned:"قبلاً خریداری شده.",
+    transactions:"تراکنش‌ها", noTx:"تراکنشی ثبت نشده.", resources:"منابع",
+    market:"بازار", catAll:"همه", catMilitary:"نظامی", catDefense:"دفاعی",
+    catPublic:"عمومی", catResearch:"پژوهش", catCosmetic:"تزئینی",
+    price:"قیمت", upkeep:"نگهداری روزانه", buy:"خرید", inventory:"کالاها", noInv:"خالی است.",
+    socialPost:"انتشار", socialPlaceholder:"چه خبر؟", charLimit:"حداکثر ۲۸۰ نویسه",
+    postEmpty:"متن خالی است.", postTooLong:"متن طولانی است.", like:"پسند", repost:"بازنشر", del:"حذف",
+    noPosts:"پستی وجود ندارد.",
+    diplomacyPropose:"پیشنهاد جنگ (نمایشی)", target:"هدف", justification:"توجیه عمومی",
+    demands:"خواسته‌ها (اختیاری)", submit:"ارسال", proposals:"پیشنهادها",
+    status_pending:"در انتظار", status_approved:"تأییدشده", status_rejected:"ردشده",
+    approve:"تأیید", reject:"رد", proposalOk:"پیشنهاد ثبت شد.",
+    noProposals:"پیشنهادی وجود ندارد.",
+    council:"شورای جهانی", vote:"رأی", yes:"موافق", no:"مخالف", abstain:"ممتنع",
+    deadline:"مهلت", alreadyVoted:"قبلاً رأی داده‌اید.", voted:"رأی ثبت شد.",
+    alliances:"اتحادها", join:"پیوستن", leave:"خروج", joined:"عضو شدید.",
+    left:"خارج شدید.", members:"اعضا", chat:"گفتگو (نمایشی)",
+    chatPlaceholder:"پیام...", send:"ارسال", noChat:"پیامی نیست.",
+    aiTitle:"مشاور محلی (بدون AI واقعی)", aiNote:"پاسخ‌ها از منطق محلی تولید می‌شوند.",
+    aiAsk:"سؤال...", aiClear:"پاک‌سازی", assistant_strategy:"راهبرد",
+    assistant_defense:"دفاع", assistant_council:"شورا", noAi:"گفتگویی نیست.",
+    notifications:"اعلان‌ها", markAll:"علامت همه خوانده", clearAll:"پاک کردن همه",
+    noNotifs:"اعلانی نیست.",
+    settings:"تنظیمات", language:"زبان", reset:"بازنشانی کل داده‌ها",
+    resetConfirm:"همه داده‌ها (شامل حساب‌ها و کشورها) پاک می‌شود. مطمئنید؟",
+    resetDone:"بازنشانی انجام شد.", account:"حساب", export:"خروجی JSON",
+    admin:"مدیریت نمایشی محلی", adminWarn:"این پنل امن نیست.",
+    accounts:"حساب‌های ثبت‌شده", claims:"کشورهای تصرف‌شده",
+    warApprovals:"پیشنهادهای جنگ", audit:"رخدادها",
+    err:"خطایی رخ داد.", success:"موفق",
+    typeSystem:"سیستم", typePurchase:"خرید", typePayout:"پرداخت",
+    typeWar:"جنگ", typeCouncil:"شورا", typeAlliance:"اتحاد"
+  },
+  en: {
+    appName:"GAME OF THE WITCHER", demo:"Demo mode",
+    demoWarn:"This is a demo. Data is stored only in your browser and is not secure.",
+    login:"Log in", register:"Register", username:"Username", password:"Password",
+    loginTitle:"Sign in to GAME OF THE WITCHER", registerTitle:"Create account on GAME OF THE WITCHER",
+    submitLogin:"Sign in", submitRegister:"Register", logout:"Log out",
+    authRequired:"Username and password required.", authWeak:"Password must be at least 4 characters.",
+    authExists:"Username already exists.", authBad:"Invalid username or password.",
+    authOk:"Welcome!", authCreated:"Account created.",
+    chooseCountry:"Choose your country",
+    chooseCountryHint:"Each country can be chosen by only one user.",
+    filterAll:"All", filterModern:"Modern", filterHistorical:"Historical",
+    claimedBy:"Claimed by", claim:"Claim", claimed:"Yours",
+    countryLocked:"This country has already been claimed.", countryClaimed:"Your country was saved.",
+    continue:"Continue", back:"Back",
+    nav_overview:"Overview", nav_country:"My Country", nav_economy:"Economy", nav_market:"Marketplace",
+    nav_social:"Social Feed", nav_diplomacy:"Diplomacy", nav_council:"World Council",
+    nav_alliances:"Alliances", nav_ai:"AI Advisor", nav_notifications:"Notifications",
+    nav_settings:"Settings", nav_admin:"Demo Admin",
+    treasury:"Treasury", approval:"Public approval", population:"Population", readiness:"Readiness",
+    research:"Research", religion:"Religion", era:"Era",
+    runPayout:"Run daily payout", lastPayout:"Last payout",
+    never:"Never", todayDone:"Payout already done today", payoutOk:"Daily payout completed.",
+    noMines:"You own no mines.", buyMine:"Buy mine", income:"Income", maint:"Maintenance",
+    insufficient:"Insufficient funds.", alreadyOwned:"Already owned.",
+    transactions:"Transactions", noTx:"No transactions yet.", resources:"Resources",
+    market:"Marketplace", catAll:"All", catMilitary:"Military", catDefense:"Defense",
+    catPublic:"Public", catResearch:"Research", catCosmetic:"Cosmetic",
+    price:"Price", upkeep:"Daily upkeep", buy:"Buy", inventory:"Inventory", noInv:"Empty.",
+    socialPost:"Post", socialPlaceholder:"What's new?", charLimit:"Max 280 chars",
+    postEmpty:"Post is empty.", postTooLong:"Post too long.", like:"Like", repost:"Repost", del:"Delete",
+    noPosts:"No posts yet.",
+    diplomacyPropose:"War proposal (demo)", target:"Target", justification:"Public justification",
+    demands:"Demands (optional)", submit:"Submit", proposals:"Proposals",
+    status_pending:"Pending", status_approved:"Approved", status_rejected:"Rejected",
+    approve:"Approve", reject:"Reject", proposalOk:"Proposal submitted.",
+    noProposals:"No proposals yet.",
+    council:"World Council", vote:"Vote", yes:"Yes", no:"No", abstain:"Abstain",
+    deadline:"Deadline", alreadyVoted:"You already voted.", voted:"Vote recorded.",
+    alliances:"Alliances", join:"Join", leave:"Leave", joined:"You joined.",
+    left:"You left.", members:"Members", chat:"Chat (demo)",
+    chatPlaceholder:"Message...", send:"Send", noChat:"No messages.",
+    aiTitle:"Local advisor (not real AI)", aiNote:"Responses are generated by local logic.",
+    aiAsk:"Ask something...", aiClear:"Clear", assistant_strategy:"Strategy",
+    assistant_defense:"Defense", assistant_council:"Council", noAi:"No conversation yet.",
+    notifications:"Notifications", markAll:"Mark all read", clearAll:"Clear all",
+    noNotifs:"No notifications.",
+    settings:"Settings", language:"Language", reset:"Reset all demo data",
+    resetConfirm:"All data (accounts and claims) will be erased. Are you sure?",
+    resetDone:"Reset complete.", account:"Account", export:"Export JSON",
+    admin:"Local demo admin", adminWarn:"This panel is not secure.",
+    accounts:"Registered accounts", claims:"Claimed countries",
+    warApprovals:"War proposals", audit:"Audit log",
+    err:"Something went wrong.", success:"Success",
+    typeSystem:"System", typePurchase:"Purchase", typePayout:"Payout",
+    typeWar:"War", typeCouncil:"Council", typeAlliance:"Alliance"
+  }
+};
+
+/* ---------- i18n ---------- */
+let LANG = (() => {
+  try { const s = localStorage.getItem("gotw-lang-v1"); if (s === "fa" || s === "en") return s; } catch {}
+  const nav = (navigator.language || "fa").toLowerCase();
+  return nav.startsWith("en") ? "en" : "fa";
+})();
+function t(key, vars) {
+  const s = (T[LANG] && T[LANG][key]) ?? (T.en[key] ?? key);
+  if (!vars) return s;
+  return String(s).replace(/\{(\w+)\}/g, (_, k) => vars[k] != null ? String(vars[k]) : `{${k}}`);
+}
+function L(v) { return v && typeof v === "object" ? (v[LANG] ?? v.en ?? "") : String(v ?? ""); }
+function applyLang() {
+  document.documentElement.lang = LANG === "fa" ? "fa-IR" : "en-US";
+  document.documentElement.dir = LANG === "fa" ? "rtl" : "ltr";
+  try { localStorage.setItem("gotw-lang-v1", LANG); } catch {}
+}
+function fmt(n) {
+  try { return new Intl.NumberFormat(LANG === "fa" ? "fa-IR" : "en-US").format(n); }
+  catch { return String(n); }
+}
+function fmtCur(n) { return fmt(n) + " " + (LANG === "fa" ? "سکه" : "GC"); }
+function fmtDate(ts) {
+  try { return new Intl.DateTimeFormat(LANG === "fa" ? "fa-IR" : "en-US", { dateStyle:"medium", timeStyle:"short" }).format(new Date(ts)); }
+  catch { return new Date(ts).toLocaleString(); }
+}
+
+/* ---------- Storage / users ---------- */
+const USERS_KEY = "gotw-users-v1";
+const SESSION_KEY = "gotw-session-v1";
+function safeParse(raw, fallback) { try { const v = JSON.parse(raw); return v && typeof v === "object" ? v : fallback; } catch { return fallback; } }
+function loadUsers() { try { return safeParse(localStorage.getItem(USERS_KEY), {}); } catch { return {}; } }
+function saveUsers(users) { try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch (e) { console.warn(e); } }
+function getSession() { try { return localStorage.getItem(SESSION_KEY) || null; } catch { return null; } }
+function setSession(u) { try { if (u) localStorage.setItem(SESSION_KEY, u); else localStorage.removeItem(SESSION_KEY); } catch {} }
+function pwdHash(pwd) { try { return btoa(unescape(encodeURIComponent("gotw::" + pwd))); } catch { return "x"; } }
+
+function makeInitialUser(username, pwd) {
+  return {
+    username, pwdHash: pwdHash(pwd), createdAt: Date.now(),
+    countryId: null, treasury: 1000000,
+    mines: [], inventory: [], transactions: [], posts: [],
+    warProposals: [], votes: {}, allianceId: null, allianceMessages: [],
+    notifications: [{
+      id: "n-welcome-" + Date.now(), type: "system", read: false,
+      title: { fa: "خوش آمدید", en: "Welcome" },
+      body: { fa: "حساب شما ساخته شد. یک کشور انتخاب کنید.", en: "Your account is ready. Choose a country." },
+      createdAt: Date.now()
+    }],
+    aiHistory: [], lastPayoutDate: null, settings: { theme: "dark" }
+  };
+}
+
+/* ---------- Claims ---------- */
+function getClaims() {
+  const users = loadUsers(); const map = {};
+  for (const u of Object.values(users)) if (u.countryId) map[u.countryId] = u.username;
+  return map;
+}
+function isCountryClaimedBy(countryId, username) {
+  const claims = getClaims();
+  return claims[countryId] && claims[countryId] !== username;
+}
+
+/* ---------- App state ---------- */
+const App = {
+  route: "overview", user: null, claims: {},
+  categoryFilter: "all", aiAssistant: "strategy", pickerEra: "all"
+};
+function persistCurrent() {
+  if (!App.user) return;
+  const users = loadUsers();
+  users[App.user.username] = App.user;
+  saveUsers(users);
+  App.claims = getClaims();
+}
+function loadCurrentFromSession() {
+  const username = getSession(); if (!username) return null;
+  const users = loadUsers(); const u = users[username];
+  if (!u) { setSession(null); return null; }
+  return u;
+}
+
+/* ---------- Toast ---------- */
+function toast(msg, kind = "info") {
+  const region = document.getElementById("toast-region");
+  if (!region) return;
+  const el = document.createElement("div");
+  el.className = "toast toast-" + kind;
+  el.textContent = msg;
+  region.appendChild(el);
+  setTimeout(() => el.classList.add("toast-out"), 2600);
+  setTimeout(() => el.remove(), 3200);
+}
+
+function addNotif(user, type, title, body) {
+  user.notifications.unshift({
+    id: "n-" + Date.now() + "-" + Math.random().toString(36).slice(2,6),
+    type, read: false,
+    title: typeof title === "string" ? { fa: title, en: title } : title,
+    body: typeof body === "string" ? { fa: body, en: body } : body,
+    createdAt: Date.now()
+  });
+  if (user.notifications.length > 200) user.notifications.length = 200;
+}
+function addTx(user, kind, amount, note) {
+  user.transactions.unshift({
+    id: "tx-" + Date.now() + "-" + Math.random().toString(36).slice(2,6),
+    kind, amount, note, createdAt: Date.now()
+  });
+  if (user.transactions.length > 200) user.transactions.length = 200;
+}
+
+/* ---------- Render helpers ---------- */
+function esc(s) {
+  return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function card(inner, cls) { return `<div class="card ${cls||""}">${inner}</div>`; }
+function stat(label, value, icon) {
+  return `<div class="stat"><div class="stat-icon">${icon||""}</div><div class="stat-body"><div class="stat-label">${esc(label)}</div><div class="stat-value">${esc(value)}</div></div></div>`;
+}
+function religionOf(id) { return RELIGIONS[id] || RELIGIONS.mixed; }
+function eraOf(id) { return ERAS[id] || ERAS.modern; }
+
+/* ================================================================
+   AUTH VIEW
+   ================================================================ */
+let authMode = "login";
+function renderAuth() {
+  const isLogin = authMode === "login";
+  return `
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="brand-line">
+          <div class="mark">W</div>
+          <strong>GAME OF THE WITCHER</strong>
+        </div>
+        <h1>${esc(isLogin ? t("loginTitle") : t("registerTitle"))}</h1>
+        <div class="auth-tabs">
+          <button class="auth-tab ${isLogin ? "active" : ""}" data-action="auth-mode" data-mode="login">${esc(t("login"))}</button>
+          <button class="auth-tab ${!isLogin ? "active" : ""}" data-action="auth-mode" data-mode="register">${esc(t("register"))}</button>
+        </div>
+        <form data-form="auth" novalidate>
+          <label><span>${esc(t("username"))}</span><input type="text" name="username" autocomplete="username" required maxlength="24" /></label>
+          <label><span>${esc(t("password"))}</span><input type="password" name="password" autocomplete="current-password" required maxlength="64" /></label>
+          <p class="error-text" data-error hidden></p>
+          <button class="btn btn-primary btn-block" type="submit">${esc(isLogin ? t("submitLogin") : t("submitRegister"))}</button>
+        </form>
+        <div class="actions" style="justify-content:center;margin-top:12px">
+          <button class="btn btn-ghost" data-action="lang" data-lang="fa">فارسی</button>
+          <button class="btn btn-ghost" data-action="lang" data-lang="en">English</button>
+        </div>
+        <div class="warn-banner">${esc(t("demoWarn"))}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ================================================================
+   COUNTRY PICKER (with era filter + religion badge)
+   ================================================================ */
+function renderCountryPicker() {
+  const claims = App.claims;
+  const my = App.user.username;
+  const filtered = App.pickerEra === "all"
+    ? COUNTRIES
+    : COUNTRIES.filter(c => c.era === App.pickerEra);
+
+  const cards = filtered.map(c => {
+    const claimer = claims[c.id];
+    const claimedByOther = claimer && claimer !== my;
+    const isMine = claimer === my;
+    const rel = religionOf(c.religion);
+    return `
+      <div class="country-pick-card ${claimedByOther ? "claimed" : ""}">
+        <div class="country-pick-head">
+          <span class="flag">${c.flag}</span>
+          <strong>${esc(L(c.name))}</strong>
+        </div>
+        <div class="desc">${esc(L(c.desc))}</div>
+        <div class="meta">
+          <span class="badge">${esc(L(c.government))}</span>
+          <span class="badge">${rel.icon} ${esc(L(rel))}</span>
+          <span class="badge">👥 ${fmt(c.population)}</span>
+          ${c.era === "historical"
+            ? `<span class="badge badge-warn">🏛️ ${esc(L(ERAS.historical))}</span>`
+            : `<span class="badge badge-success">🌐 ${esc(L(ERAS.modern))}</span>`}
+        </div>
+        ${claimedByOther
+          ? `<div class="badge badge-error">${esc(t("claimedBy"))}: ${esc(claimer)}</div>`
+          : isMine
+            ? `<div class="badge badge-success">${esc(t("claimed"))}</div>
+               <button class="btn btn-primary" data-action="resume">${esc(t("continue"))}</button>`
+            : `<button class="btn btn-primary" data-action="claim" data-id="${c.id}">${esc(t("claim"))}</button>`}
+      </div>`;
+  }).join("");
+
+  const eras = [["all","filterAll"],["modern","filterModern"],["historical","filterHistorical"]];
+  const filter = eras.map(([k, key]) =>
+    `<button class="auth-tab ${App.pickerEra===k?"active":""}" data-action="picker-era" data-era="${k}">${esc(t(key))}</button>`
+  ).join("");
+
+  return `
+    <div class="auth-wrap" style="align-items:flex-start;padding-top:32px">
+      <div style="width:100%;max-width:1180px">
+        <div class="auth-card" style="max-width:none;margin-bottom:16px">
+          <div class="brand-line">
+            <div class="mark">W</div>
+            <strong>GAME OF THE WITCHER</strong>
+            <span style="flex:1"></span>
+            <button class="btn btn-ghost" data-action="lang" data-lang="fa">فارسی</button>
+            <button class="btn btn-ghost" data-action="lang" data-lang="en">English</button>
+            <button class="btn" data-action="logout">${esc(t("logout"))}</button>
+          </div>
+          <h1>${esc(t("chooseCountry"))}</h1>
+          <p class="hint">${esc(t("chooseCountryHint"))}</p>
+          <div class="auth-tabs" style="max-width:520px;margin-top:12px">${filter}</div>
+        </div>
+        <div class="country-pick-grid">${cards || `<p class="empty">—</p>`}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ================================================================
+   SHELL
+   ================================================================ */
+const NAV = [
+  ["overview","nav_overview"], ["country","nav_country"], ["economy","nav_economy"],
+  ["market","nav_market"], ["social","nav_social"], ["diplomacy","nav_diplomacy"],
+  ["council","nav_council"], ["alliances","nav_alliances"], ["ai","nav_ai"],
+  ["notifications","nav_notifications"], ["settings","nav_settings"], ["admin","nav_admin"]
+];
+const MOBILE_NAV = ["overview","economy","social","council","settings"];
+
+function myCountry() { return COUNTRIES.find(c => c.id === App.user.countryId) || null; }
+
+function renderShell() {
+  const u = App.user, c = myCountry();
+  const unread = u.notifications.filter(n => !n.read).length;
+  const alliance = u.allianceId ? ALLIANCES.find(a => a.id === u.allianceId) : null;
+
+  const nav = NAV.map(([key, labelKey]) => `
+    <button class="nav-item ${App.route===key?"active":""}" data-action="route" data-route="${key}">
+      <span>${esc(t(labelKey))}</span>
+      ${key==="notifications" && unread ? `<span class="pill">${unread}</span>` : ""}
+    </button>
+  `).join("");
+
+  const mobileNav = MOBILE_NAV.map(k => {
+    const label = NAV.find(n => n[0]===k)?.[1] || k;
+    return `<button class="mobile-nav-item ${App.route===k?"active":""}" data-action="route" data-route="${k}">
+      <span class="mobile-label">${esc(t(label))}</span>
+    </button>`;
+  }).join("");
+
+  return `
+    <div class="shell" id="shell">
+      <aside class="sidebar">
+        <div class="brand"><div class="mark">W</div><strong>GAME OF THE WITCHER</strong></div>
+        <div class="badge badge-warn demo-banner">${esc(t("demo"))}</div>
+        <nav class="nav">${nav}</nav>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <button class="icon-btn menu-btn" data-action="toggle-menu" aria-label="menu">☰</button>
+          <div class="topbar-title"><h2>${esc(t(NAV.find(n=>n[0]===App.route)?.[1] || "nav_overview"))}</h2></div>
+          <div class="topbar-right">
+            <div class="resource-chips">
+              <span class="chip"><span class="chip-icon">💰</span>${esc(fmtCur(u.treasury))}</span>
+              ${c ? `<span class="chip"><span class="chip-icon">${c.flag}</span>${esc(L(c.name))}</span>` : ""}
+              ${alliance ? `<span class="chip"><span class="chip-icon">🌍</span>${esc(L(alliance.name))}</span>` : ""}
+            </div>
+            <button class="lang-btn ${LANG==="fa"?"active":""}" data-action="lang" data-lang="fa">FA</button>
+            <button class="lang-btn ${LANG==="en"?"active":""}" data-action="lang" data-lang="en">EN</button>
+            <button class="icon-btn" data-action="route" data-route="notifications" aria-label="notifications">🔔${unread?`<span class="dot"></span>`:""}</button>
+            <button class="icon-btn" data-action="logout" aria-label="logout">⎋</button>
+          </div>
+        </header>
+        <main class="view" id="view"></main>
+      </div>
+      <nav class="mobile-nav">${mobileNav}</nav>
+      <div class="sidebar-backdrop" data-action="toggle-menu"></div>
+    </div>
+  `;
+}
+
+/* ================================================================
+   VIEWS
+   ================================================================ */
+const VIEWS = {};
+
+VIEWS.overview = () => {
+  const u = App.user, c = myCountry();
+  if (!c) return card(`<p class="empty">${esc(t("chooseCountry"))}</p>`);
+  const rel = religionOf(c.religion);
+  return `
+    <section class="grid-stats">
+      ${stat(t("treasury"), fmtCur(u.treasury), "💰")}
+      ${stat(t("population"), fmt(c.population), "👥")}
+      ${stat(t("religion"), L(rel), rel.icon)}
+      ${stat(t("era"), L(eraOf(c.era)), c.era === "historical" ? "🏛️" : "🌐")}
+      ${stat(t("readiness"), "50%", "🛡️")}
+      ${stat(t("research"), "2", "🔬")}
+    </section>
+    <div class="grid grid-2">
+      ${card(`
+        <h3>${c.flag} ${esc(L(c.name))}</h3>
+        <p class="muted">${esc(L(c.desc))}</p>
+        <div class="chips">
+          ${Object.entries(c.resources).map(([k,v])=>`<span class="chip">${RES_META[k].icon} ${esc(L(RES_META[k]))}: ${v}</span>`).join("")}
+        </div>
+      `)}
+      ${card(`
+        <h3>⚡ ${esc(t("runPayout"))}</h3>
+        <p class="muted small">${esc(t("lastPayout"))}: ${esc(u.lastPayoutDate || t("never"))}</p>
+        <div class="actions">
+          <button class="btn btn-primary" data-action="payout">${esc(t("runPayout"))}</button>
+          <button class="btn" data-action="route" data-route="market">${esc(t("market"))}</button>
+        </div>
+      `)}
+    </div>
+  `;
+};
+
+VIEWS.country = () => {
+  const c = myCountry(); if (!c) return card(`<p class="empty">—</p>`);
+  const rel = religionOf(c.religion);
+  const era = eraOf(c.era);
+  return card(`
+    <h3>${c.flag} ${esc(L(c.name))}</h3>
+    <p class="muted">${esc(L(c.desc))}</p>
+    <div class="grid grid-2 mt-8">
+      ${stat(t("population"), fmt(c.population), "👥")}
+      ${stat(t("treasury"), fmtCur(App.user.treasury), "💰")}
+      ${stat(t("religion"), L(rel), rel.icon)}
+      ${stat(t("era"), L(era), era.icon)}
+    </div>
+    <p class="mt-8"><strong>${esc(L({fa:"حکومت",en:"Government"}))}:</strong> ${esc(L(c.government))}</p>
+    <div class="chips">
+      ${Object.entries(c.resources).map(([k,v])=>`<span class="chip">${RES_META[k].icon} ${esc(L(RES_META[k]))}: ${v}</span>`).join("")}
+    </div>
+  `);
+};
+
+VIEWS.economy = () => {
+  const u = App.user;
+  const ownedIds = new Set(u.mines.map(m => m.id));
+  const mineRows = MINES.map(m => {
+    const owned = ownedIds.has(m.id);
+    return `<div class="item-row">
+      <div><strong>${esc(L(m.name))}</strong>
+        <div class="muted small">${esc(t("income"))}: ${fmtCur(m.dailyIncome)} • ${esc(t("maint"))}: ${fmtCur(m.maintenance)}</div>
+      </div>
+      <div class="item-actions">
+        <span class="price">${fmtCur(m.price)}</span>
+        ${owned ? `<span class="badge badge-success">✓</span>`
+                : `<button class="btn btn-primary" data-action="buy-mine" data-id="${m.id}">${esc(t("buyMine"))}</button>`}
+      </div>
+    </div>`;
+  }).join("");
+  const tx = u.transactions.length === 0
+    ? `<p class="empty">${esc(t("noTx"))}</p>`
+    : `<ul class="simple-list">${u.transactions.slice(0,20).map(x=>`
+        <li>
+          <span class="badge ${x.kind==="income"?"badge-success":"badge-warn"}">${esc(x.kind)}</span>
+          <span>${esc(fmtCur(x.amount))}</span>
+          <span class="muted small">${esc(x.note)}</span>
+          <span class="muted small">${esc(fmtDate(x.createdAt))}</span>
+        </li>`).join("")}</ul>`;
+  return `
+    ${card(`<h3>${esc(t("buyMine"))}</h3>${mineRows}`)}
+    ${card(`<h3>${esc(t("transactions"))}</h3>${tx}`)}
+  `;
+};
+
+VIEWS.market = () => {
+  const u = App.user;
+  const cats = [["all","catAll"],["military","catMilitary"],["defense","catDefense"],["public","catPublic"],["research","catResearch"],["cosmetic","catCosmetic"]];
+  const filter = App.categoryFilter;
+  const items = PRODUCTS.filter(p => filter==="all" || p.category===filter);
+  return `
+    ${card(`
+      <h3>${esc(t("market"))}</h3>
+      <div class="chips">
+        ${cats.map(([c,k])=>`<button class="chip chip-btn ${filter===c?"active":""}" data-action="market-cat" data-cat="${c}">${esc(t(k))}</button==>`).join("")}
+      </div>
+      ${items.map(p => {
+        const owned = u.inventory.find(x => x.productId === p.id);
+        return `<div class="pending="item-row"">
+          <div><strong>${p.icon} ? ${esc(L(p.name))}</strong>
+            ${p.upkeep?`<div class="muted small">${esc(t("upkeep"))}: ${fmtCur(p.upkeep)}</div>`:""}
+          </div>
+          <div class="item-actions">
+            <span class="price">${fmtCur(p.price)}</span>
+            ${owned && p.category!=="cosmetic"
+              ? `<span class="badge badge-success">×${owned.quantity}</span>`
+              : `<button class="btn btn-primary" data-action="buy-product" data-id="${p.id}">${esc(t("buy"))}</button>`}
+          </div>
+        </div>`;
+      }).join("")}
+    `)}
+    ${card(`
+      <h3>${esc(t("inventory"))}</h3>
+      ${u.inventory.length===0 ? `<p class="empty">${esc(t("noInv"))}</p>` :
+        `<ul class="simple-list">${u.inventory.map(inv=>{
+          const p = PRODUCTS.find(x=>x.id===inv.productId);
+          return `<li>${p.icon} ${esc(L(p.name))} × ${inv.quantity}</li>`;
+        }).join("")}</ul>`}
+    `)}
+  `;
+};
+
+VIEWS.social = () => {
+  const u = App.user;
+  const seedPosts = getSeedPosts();
+  const all = [...u.posts, ...seedPosts].sort((a,b)=>b.createdAt-a.createdAt);
+  return `
+    ${card(`
+      <form data-form="post" class="post-form">
+        <textarea name="text" maxlength="280" placeholder="${esc(t("socialPlaceholder"))}"></textarea>
+        <div class="post-actions">
+          <span class="hint">${esc(t("charLimit"))}</span>
+          <button class="btn btn-primary" type="submit">${esc(t("socialPost"))}</button>
+        </div>
+      </form>
+    `)}
+    ${all.length === 0 ? `<p class="empty">${esc(t("noPosts"))}</p>` :
+      all.map(p => `
+        <article class="post">
+          <div class="post-header">
+            <span>${p.authorFlag||"🏳️"}</span>
+            <strong>${esc(L(p.authorName))}</strong>
+            <span class="muted small">${esc(fmtDate(p.createdAt))}</span>
+            ${p.isMine ? `<span class="badge">${esc(u.username)}</span>` : ""}
+          </div>
+          <p class="post-body" data-text></p>
+          <div class="post-actions">
+            <button class="btn btn-ghost" data-action="like-post" data-id="${p.id}">${p.likedByMe?"❤️":"🤍"} ${p.likes||0}</button>
+            ${p.isMine ? `<button class="btn btn-ghost" data-action="del-post" data-id="${p.id}">${esc(t("del"))}</button>` : ""}
+          </div>
+        </article>
+      `).join("")}
+  `;
+};
+
+function hydratePosts() {
+  const view = document.getElementById("view"); if (!view) return;
+  const u = App.user;
+  const all = [...u.posts, ...getSeedPosts()].sort((a,b)=>b.createdAt-a.createdAt);
+  view.querySelectorAll(".post").forEach((el, i) => {
+    const p = all[i];
+    if (p) {
+      const tgt = el.querySelector("[data-text]");
+      if (tgt) tgt.textContent = typeof p.text === "string" ? p.text : (p.text[LANG] || p.text.en || "");
+    }
+  });
+}
+
+function getSeedPosts() {
+  return [
+    { id:"seed-1", authorId:"us", authorFlag:"🇺🇸", authorName:{fa:"ایالات متحده آمریکا",en:"United States"}, text:{fa:"بیانیه مشترک با متحدان درباره امنیت منطقه.",en:"Joint statement with allies on regional security."}, createdAt:Date.now()-1000*60*60*2, likes:12 },
+    { id:"seed-2", authorId:"cn", authorFlag:"🇨🇳", authorName:{fa:"چین",en:"China"}, text:{fa:"گسترش همکاری‌های تجاری با شرکای آسیایی.",en:"Expanding trade cooperation with Asian partners."}, createdAt:Date.now()-1000*60*60*4, likes:8 },
+    { id:"seed-3", authorId:"de", authorFlag:"🇩🇪", authorName:{fa:"آلمان",en:"Germany"}, text:{fa:"سرمایه‌گذاری جدید در انرژی پاک.",en:"New investment in clean energy."}, createdAt:Date.now()-1000*60*60*6, likes:6 },
+    { id:"seed-4", authorId:"ir", authorFlag:"🇮🇷", authorName:{fa:"ایران",en:"Iran"}, text:{fa:"گفتگوهای منطقه‌ای برای کاهش تنش.",en:"Regional talks to reduce tension."}, createdAt:Date.now()-1000*60*60*8, likes:4 }
+  ];
+}
+
+VIEWS.diplomacy = () => {
+  const u = App.user;
+  const others = COUNTRIES.filter(c => c.id !== u.countryId);
+  const rows = u.warProposals.length === 0
+    ? `<p class="empty">${esc(t("noProposals"))}</p>`
+    : u.warProposals.map(p => {
+        const target = COUNTRIES.find(c => c.id === p.targetId);
+        const statusKey = "status_" + p.status;
+        return `<div class="item-row">
+          <div>
+            <strong>${target?.flag||""} ${esc(L(target?.name)||"")}</strong>
+            <span class="badge ${p.status==="approved"?"badge-success":p.status==="rejected"?"badge-error":"badge-warn"}">${esc(t(statusKey))}</span>
+            <div class="muted small">${esc(p.justification)}</div>
+          </div>
+          ${p.status `
+            <div class="item-actions">
+              <button class="btn" data-action="war-approve" data-id="${p.id}">${esc(t("approve"))}</button>
+              <button class="btn" data-action="war-reject" data-id="${p.id}">${esc(t("reject"))}</button>
+            </div>` : ""}
+        </div>`;
+      }).join("");
+  return `
+    ${card(`
+      <h3>${esc(t("diplomacyPropose"))}</h3>
+      <form data-form="war" class="form">
+        <label><span>${esc(t("target"))}</span>
+          <select name="target">${others.map(c=>`<option value="${c.id}">${c.flag} ${esc(L(c.name))}</option>`).join("")}</select>
+        </label>
+        <label><span>${esc(t("justification"))}</span><textarea name="justification" maxlength="300" required></textarea></label>
+        <label><span>${esc(t("demands"))}</span><input type="text" name="demands" maxlength="200"/></label>
+        <button class="btn btn-primary" type="submit">${esc(t("submit"))}</button>
+      </form>
+    `)}
+    ${card(`<h3>${esc(t("proposals"))}</h3>${rows}`)}
+  `;
+};
+
+VIEWS.council = () => {
+  const u = App.user;
+  return RESOLUTIONS.map(r => {
+    const votes = u.votes[r.id] || { yes:0, no:0, abstain:0 };
+    const myVote = u.votes[r.id + "::mine"];
+    return card(`
+      <h3>${esc(L(r.title))}</h3>
+      <p class="muted small">${esc(L(r.summary))}</p>
+      <p class="muted small">${esc(t("deadline"))}: ${esc(fmtDate(r.deadline))}</p>
+      <div class="chips">
+        <span class="chip">${esc(t("yes"))}: ${votes.yes||0}</span>
+        <span class="chip">${esc(t("no"))}: ${votes.no||0}</span>
+        <span class="chip">${esc(t("abstain"))}: ${votes.abstain||0}</span>
+      </div>
+      ${myVote
+        ? `<span class="badge badge-success">${esc(t("voted"))} — ${esc(t(myVote))}</span>`
+        : `<div class="actions">
+            <button class="btn btn-primary" data-action="vote" data-id="${r.id}" data-choice="yes">${esc(t("yes"))}</button>
+            <button class="btn" data-action="vote" data-id="${r.id}" data-choice="no">${esc(t("no"))}</button>
+            <button class="btn" data-action="vote" data-id="${r.id}" data-choice="abstain">${esc(t("abstain"))}</button>
+          </div>`}
+    `);
+  }).join("");
+};
+
+VIEWS.alliances = () => {
+  const u = App.user;
+  const cards = ALLIANCES.map(a => {
+    const members = COUNTRIES.filter(c => (COUNTRY_ALLIANCES[c.id]||[]).includes(a.id));
+    const isMember = u.allianceId === a.id;
+    return card(`
+      <h3><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${a.color};margin-inline-end:8px"></span>${esc(L(a.name))}</h3>
+      <div class="chips">${members.map(m=>`<span class="chip">${m.flag} ${esc(L(m.name))}</span>`).join("")}</div>
+      ${isMember
+        ? `<button class="btn" data-action="leave-alliance">${esc(t("leave"))}</button>`
+        : `<button class="btn btn-primary" data-action="join-alliance" data-id="${a.id}">${esc(t("join"))}</button>`}
+    `);
+  }).join("");
+  const chat = u.allianceId ? card(`
+    <h3>${esc(t("chat"))}</h3>
+    ${u.allianceMessages.length===0 ? `<p class="empty">${esc(t("noChat"))}</p>` :
+      `<div class="chat">${u.allianceMessages.slice(0,30).map(m=>`
+        <div class="chat-msg"><strong>${esc(m.author)}</strong><span class="muted small">${esc(fmtDate(m.createdAt))}</span><p data-chat-text></p></div>`).join("")}</div>`}
+    <form data-form="chat" class="post-form">
+      <input type="text" name="text" maxlength="400" placeholder="${esc(t("chatPlaceholder"))}"/>
+      <button class="btn btn-primary" type="submit">${esc(t("send"))}</button>
+    </form>
+  `) : "";
+  return cards + chat;
+};
+
+function hydrateChat() {
+  const view = document.getElementById("view"); if (!view) return;
+  const msgs = App.user.allianceMessages.slice(0,30);
+  view.querySelectorAll(".chat-msg").forEach((el, i) => {
+    const m = msgs[i];
+    if (m) el.querySelector("[data-chat-text]").textContent = m.text;
+  });
+}
+
+VIEWS.ai = () => {
+  const u = App.user;
+  const history = u.aiHistory.filter(h => h.assistant === App.aiAssistant);
+  const assistants = [["strategy","assistant_strategy"],["defense","assistant_defense"],["council","assistant_council"]];
+  const suggestions = {
+    strategy: LANG==="fa" ? ["گزینه‌های دیپلماتیک چیست؟","چگونه اقتصاد را تقویت کنم؟"] : ["What are my diplomatic options?","How do I strengthen the economy?"],
+    defense: LANG==="fa" ? ["آمادگی دفاعی را تحلیل کن.","هزینه‌های نگهداری را کاهش بده."] : ["Analyze my defense readiness.","Reduce maintenance costs."],
+    council: LANG==="fa" ? ["خلاصه قطعنامه‌ها را بده.","پیش‌نویس قطعنامه صلح."] : ["Summarize pending resolutions.","Draft a peace resolution."]
+  }[App.aiAssistant] || [];
+  return card(`
+    <h3>${esc(t("aiTitle"))}</h3>
+    <p class="muted small">${esc(t("aiNote"))}</p>
+    <div class="chips">
+      ${assistants.map(([k,label])=>`<button class="chip chip-btn ${App.aiAssistant===k?"active":""}" data-action="ai-assistant" data-id="${k}">${esc(t(label))}</button>`).join("")}
+    </div>
+    <div class="ai-suggestions">
+      ${suggestions.map(s=>`<button class="btn btn-ghost" data-action="ai-prompt" data-prompt="${esc(s)}">${esc(s)}</button>`).join("")}
+    </div>
+    <div class="ai-history">
+      ${history.length===0 ? `<p class="empty">${esc(t("noAi"))}</p>` :
+        history.map(h=>`
+          <div class="ai-entry">
+            <div class="ai-user">🧑 ${esc(h.prompt)}</div>
+            <div class="ai-response"><strong>${esc(h.response.title)}</strong><p data-ai-text></p></div>
+          </div>`).join("")}
+    </div>
+    <form data-form="ai" class="post-form">
+      <input type="text" name="prompt" maxlength="400" placeholder="${esc(t("aiAsk"))}" required/>
+      <button class="btn btn-primary" type="submit">${esc(t("send"))}</button>
+    </form>
+    <button class="btn btn-ghost" data-action="ai-clear">${esc(t("aiClear"))}</button>
+  `);
+};
+
+function hydrateAI() {
+  const view = document.getElementById("view"); if (!view) return;
+  const history = App.user.aiHistory.filter(h => h.assistant === App.aiAssistant);
+  view.querySelectorAll(".ai-entry").forEach((el, i) => {
+    const h = history[i];
+    if (h) el.querySelector("[data-ai-text]").textContent = h.response.body;
+  });
+}
+
+function localAdvisor(assistant, prompt) {
+  const u = App.user, c = myCountry();
+  const fa = LANG === "fa";
+  const rel = religionOf(c.religion);
+  if (assistant === "strategy") {
+    return {
+      title: fa ? "تحلیل راهبردی" : "Strategic analysis",
+      body: fa
+        ? `کشور شما (${L(c.name)}) با دین ${L(rel)} در دوره ${L(eraOf(c.era))}، خزانه ${fmtCur(u.treasury)} و ${u.mines.length} معدن فعال. پیشنهاد: دیپلماسی، سپس تقویت اقتصاد.`
+        : `Your country (${L(c.name)}) — religion ${L(rel)}, era ${L(eraOf(c.era))}, treasury ${fmtCur(u.treasury)}, ${u.mines.length} active mines. Suggestion: diplomacy first, then economy.`
+    };
+  }
+  if (assistant === "defense") {
+    const upkeep = u.inventory.reduce((s,i)=>s + (PRODUCTS.find(p=>p.id===i.productId)?.upkeep||0)*i.quantity, 0);
+    return {
+      title: fa ? "تحلیل دفاعی" : "Defense analysis",
+      body: fa
+        ? `نگهداری روزانه تقریباً ${fmtCur(upkeep)}. ${u.treasury < 200000 ? "با خزانه پایین خرید سنگین را به تعویق بیندازید." : "خرید تجهیزات دفاعی هوشمندانه است."}`
+        : `Daily upkeep ~${fmtCur(upkeep)}. ${u.treasury < 200000 ? "Defer heavy purchases due to low treasury." : "Adding defensive equipment is reasonable."}`
+    };
+  }
+  return {
+    title: fa ? "تحلیل شورا" : "Council analysis",
+    body: fa
+      ? `${RESOLUTIONS.length} قطعنامه در جریان. پیش از رأی، خلاصه هر یک را بخوانید.`
+      : `${RESOLUTIONS.length} resolutions open. Review each summary before voting.`
+  };
+}
+
+VIEWS.notifications = () => {
+  const u = App.user;
+  if (u.notifications.length === 0) return `<p class="empty">${esc(t("noNotifs"))}</p>`;
+  return card(`
+    <div class="actions" style="justify-content:flex-end">
+      <button class="btn" data-action="notif-mark-all">${esc(t("markAll"))}</button>
+      <button class="btn" data-action="notif-clear">${esc(t("clearAll"))}</button>
+    </div>
+    <ul class="simple-list">
+      ${u.notifications.map(n=>`
+        <li>
+          <div>
+            <span class="badge">${esc(t("type"+n.type.charAt(0).toUpperCase()+n.type.slice(1)))}</span>
+            <strong>${esc(L(n.title))}</strong>
+            <div class="muted small">${esc(L(n.body))}</div>
+            <div class="muted small">${esc(fmtDate(n.createdAt))}</div>
+          </div>
+        </li>`).join("")}
+    </ul>
+  `);
+};
+
+VIEWS.settings = () => {
+  const u = App.user;
+  return `
+    ${card(`
+      <h3>${esc(t("account"))}</h3>
+      <p><strong>${esc(u.username)}</strong></p>
+      <p class="muted small">${esc(t("language"))}: ${LANG}</p>
+      <div class="actions">
+        <button class="btn ${LANG==="fa"?"btn-primary":""}" data-action="lang" data-lang="fa">فارسی</button>
+        <button class="btn ${LANG==="en"?"btn-primary":""}" data-action="lang" data-lang="en">English</button>
+      </div>
+    `)}
+    ${card(`
+      <h3>${esc(t("settings"))}</h3>
+      <div class="actions">
+        <button class="btn" data-action="export">${esc(t("export"))}</button>
+        <button class="btn btn-danger" data-action="reset-all">${esc(t("reset"))}</button>
+        <button class="btn" data-action="logout">${esc(t("logout"))}</button>
+      </div>
+    `)}
+  `;
+};
+
+VIEWS.admin = () => {
+  const users = loadUsers();
+  const claims = App.claims;
+  const totalClaims = Object.keys(claims).length;
+  return `
+    ${card(`
+      <h3>${esc(t("admin"))}</h3>
+      <div class="badge badge-warn">${esc(t("adminWarn"))}</div>
+      <p class="muted small mt-8">Total countries: ${COUNTRIES.length} — Modern: ${COUNTRIES.filter(c=>c.era==="modern").length} — Historical: ${COUNTRIES.filter(c=>c.era==="historical").length} — Claimed: ${totalClaims}</p>
+    `)}
+    <div class="grid grid-2">
+      ${card(`
+        <h4>${esc(t("accounts"))}</h4>
+        <ul class="simple-list">
+          ${Object.values(users).map(u=>`<li><strong>${esc(u.username)}</strong> <span class="badge">${u.countryId?esc(u.countryId):"—"}</span> <span class="muted small">${esc(fmtCur(u.treasury))}</span></li>`).join("") || `<li>—</li>`}
+        </ul>
+      `)}
+      ${card(`
+        <h4>${esc(t("claims"))}</h4>
+        <ul class="simple-list">
+          ${Object.entries(claims).map(([cid,un])=>{
+            const c = COUNTRIES.find(x=>x.id===cid);
+            return `<li>${c?c.flag:""} ${esc(c?L(c.name):cid)} <span class="badge">${esc(un)}</span></li>`;
+          }).join("") || `<li>—</li>`}
+        </ul>
+      `)}
+      ${card(`
+        <h4>${esc(t("warApprovals"))}</h4>
+        ${App.user.warProposals.filter(w=>w.status==="pending").length===0
+          ? `<p class="empty">—</p>`
+          : App.user.warProposals.filter(w=>w.status==="pending").map(w=>`
+              <div class="item-row">
+                <div class="small">${esc(w.justification.slice(0,80))}</div>
+                <div class="item-actions">
+                  <button class="btn" data-action="war-approve" data-id="${w.id}">✓</button>
+                  <button class="btn" data-action="war-reject" data-id="${w.id}">✕</button>
+                </div>
+              </div>`).join("")}
+      `)}
+      ${card(`
+        <h4>${esc(t("audit"))}</h4>
+        <p class="muted small">GAME OF THE WITCHER — demo admin. No server-side security.</p>
+      `)}
+    </div>
+  `;
+};
+
+/* ================================================================
+   MAIN RENDER
+   ================================================================ */
+function render() {
+  applyLang();
+  const app = document.getElementById("app");
+  if (!App.user) { app.innerHTML = renderAuth(); bindCommon(); return; }
+  if (!App.user.countryId) { app.innerHTML = renderCountryPicker(); bindCommon(); return; }
+  app.innerHTML = renderShell();
+  const view = document.getElementById("view");
+  view.innerHTML = (VIEWS[App.route] || VIEWS.overview)();
+  if (App.route === "social") hydratePosts();
+  if (App.route === "alliances") hydrateChat();
+  if (App.route === "ai") hydrateAI();
+  bindCommon();
+}
+
+/* ================================================================
+   EVENTS
+   ================================================================ */
+let boundOnce = false;
+function bindCommon() {
+  if (boundOnce) return;
+  boundOnce = true;
+
+  document.getElementById("app").addEventListener("click", (ev) => {
+    const btn = ev.target.closest("[data-action]");
+    if (!btn) return;
+    const a = btn.getAttribute("data-action");
+    const id = btn.getAttribute("data-id");
+    const route = btn.getAttribute("data-route");
+    const lang = btn.getAttribute("data-lang");
+    const mode = btn.getAttribute("data-mode");
+    const cat = btn.getAttribute("data-cat");
+    const choice = btn.getAttribute("data-choice");
+    const era = btn.getAttribute("data-era");
+    const promptAttr = btn.getAttribute("data-prompt");
+
+    if (a === "lang") { LANG = lang; applyLang(); if (App.user) persistCurrent(); render(); return; }
+    if (a === "toggle-menu") { document.getElementById("shell")?.classList.toggle("sidebar-open"); return; }
+    if (a === "logout") { setSession(null); App.user = null; App.route = "overview"; render(); return; }
+    if (a === "auth-mode") { authMode = mode; render(); return; }
+    if (a === "route") { App.route = route; render(); return; }
+    if (a === "picker-era") { App.pickerEra = era; render(); return; }
+
+    if (!App.user) return;
+
+    if (a === "claim") {
+      const country = COUNTRIES.find(c => c.id === id);
+      if (!country) return;
+      if (isCountryClaimedBy(id, App.user.username)) { toast(t("countryLocked"), "error"); return; }
+      App.user.countryId = id;
+      persistCurrent();
+      toast(t("countryClaimed"), "success");
+      render();
+      return;
+    }
+    if (a === "resume") { render(); return; }
+    if (a === "payout") {
+      const today = new Date().toISOString().slice(0,10);
+      if (App.user.lastPayoutDate === today) { toast(t("todayDone"), "error"); return; }
+      let income = 0, expense = 0;
+      for (const owned of App.user.mines) {
+        const m = MINES.find(x => x.id === owned.id); if (!m) continue;
+        income += m.dailyIncome; expense += m.maintenance;
+      }
+      for (const inv of App.user.inventory) {
+        const p = PRODUCTS.find(x => x.id === inv.productId);
+        if (p?.upkeep) expense += p.upkeep * inv.quantity;
+      }
+      const net = income - expense;
+      App.user.treasury += net;
+      App.user.lastPayoutDate = today;
+      addTx(App.user, net >= 0 ? "income" : "expense", Math.abs(net), "daily-payout");
+      addNotif(App.user, "payout", "Daily payout", `net: ${net}`);
+      persistCurrent(); toast(t("payoutOk"), "success"); render();
+      return;
+    }
+    if (a === "buy-mine") {
+      const m = MINES.find(x => x.id === id); if (!m) return;
+      if (App.user.mines.some(x => x.id === id)) { toast(t("alreadyOwned"), "error"); return; }
+      if (App.user.treasury < m.price) { toast(t("insufficient"), "error"); return; }
+      App.user.treasury -= m.price;
+      App.user.mines.push({ id: m.id, at: Date.now() });
+      addTx(App.user, "expense", m.price, "mine:" + m.id);
+      addNotif(App.user, "purchase", "Mine purchased", L(m.name));
+      persistCurrent(); toast(t("success"), "success"); render();
+      return;
+    }
+    if (a === "market-cat") { App.categoryFilter = cat; render(); return; }
+    if (a === "buy-product") {
+      const p = PRODUCTS.find(x => x.id === id); if (!p) return;
+      if (App.user.treasury < p.price) { toast(t("insufficient"), "error"); return; }
+      const existing = App.user.inventory.find(x => x.productId === id);
+      if (existing && p.category !== "cosmetic") { toast(t("alreadyOwned"), "error"); return; }
+      App.user.treasury -= p.price;
+      if (existing) existing.quantity += 1;
+      else App.user.inventory.push({ productId: id, quantity: 1, at: Date.now() });
+      addTx(App.user, "expense", p.price, "product:" + p.id);
+      addNotif(App.user, "purchase", "Purchase", L(p.name));
+      persistCurrent(); toast(t("success"), "success"); render();
+      return;
+    }
+    if (a === "like-post") {
+      const post = App.user.posts.find(p => p.id === id);
+      if (post) {
+        post.likedByMe = !post.likedByMe;
+        post.likes = (post.likes || 0) + (post.likedByMe ? 1 : -1);
+        persistCurrent();
+      }
+      render(); return;
+    }
+    if (a === "del-post") {
+      App.user.posts = App.user.posts.filter(p => p.id !== id);
+      persistCurrent(); render(); return;
+    }
+    if (a === "war-approve" || a === "war-reject") {
+      const proposal = App.user.warProposals.find(p => p.id === id);
+      if (!proposal || proposal.status !== "pending") return;
+      proposal.status = a === "war-approve" ? "approved" : "rejected";
+      proposal.history = proposal.history || [];
+      proposal.history.push({ at: Date.now(), status: proposal.status });
+      addNotif(App.user, "war", "War proposal update", proposal.status);
+      persistCurrent(); render(); return;
+    }
+    if (a === "vote") {
+      const resId = id;
+      if (App.user.votes[resId + "::mine"]) { toast(t("alreadyVoted"), "error"); return; }
+      App.user.votes[resId + "::mine"] = choice;
+      App.user.votes[resId] = App.user.votes[resId] || { yes:0, no:0, abstain:0 };
+      App.user.votes[resId][choice] = (App.user.votes[resId][choice] || 0) + 1;
+      addNotif(App.user, "council", "Vote recorded", resId + ": " + choice);
+      persistCurrent(); toast(t("voted"), "success"); render();
+      return;
+    }
+    if (a === "join-alliance") { App.user.allianceId = id; persistCurrent(); toast(t("joined"), "success"); render(); return; }
+    if (a === "leave-alliance") { App.user.allianceId = null; persistCurrent(); toast(t("left"), "success"); render(); return; }
+    if (a === "ai-assistant") { App.aiAssistant = id; render(); return; }
+    if (a === "ai-prompt") {
+      const res = localAdvisor(App.aiAssistant, promptAttr);
+      App.user.aiHistory.push({ assistant: App.aiAssistant, prompt: promptAttr, response: res, at: Date.now() });
+      persistCurrent(); render(); return;
+    }
+    if (a === "ai-clear") { App.user.aiHistory = []; persistCurrent(); render(); return; }
+    if (a === "notif-mark-all") { App.user.notifications.forEach(n => n.read = true); persistCurrent(); render(); return; }
+    if (a === "notif-clear") { App.user.notifications = []; persistCurrent(); render(); return; }
+    if (a === "export") {
+      try {
+        const blob = new Blob([JSON.stringify(App.user, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url; link.download = `gotw-${App.user.username}.json`; link.click();
+        URL.revokeObjectURL(url);
+      } catch { toast(t("err"), "error"); }
+      return;
+    }
+    if (a === "reset-all") {
+      if (!confirm(t("resetConfirm"))) return;
+      try { localStorage.removeItem(USERS_KEY); localStorage.removeItem(SESSION_KEY); } catch {}
+      App.user = null; App.claims = {}; App.route = "overview";
+      toast(t("resetDone"), "success"); render(); return;
+    }
+  });
+
+  document.getElementById("app").addEventListener("submit", (ev) => {
+    const form = ev.target.closest("form[data-form]");
+    if (!form) return;
+    ev.preventDefault();
+    const kind = form.getAttribute("data-form");
+
+    if (kind === "auth") {
+      const username = (form.username.value || "").trim();
+      const password = form.password.value || "";
+      const errEl = form.querySelector("[data-error]");
+      const fail = (msg) => { if (errEl) { errEl.textContent = msg; errEl.hidden = false; } };
+      if (!username || !password) return fail(t("authRequired"));
+      if (password.length < 4) return fail(t("authWeak"));
+      if (!/^[A-Za-z0-9_.-]{3,24}$/.test(username)) return fail(t("authRequired"));
+      const users = loadUsers();
+      if (authMode === "register") {
+        if (users[username]) return fail(t("authExists"));
+        const u = makeInitialUser(username, password);
+        users[username] = u; saveUsers(users);
+        setSession(username); App.user = u; App.claims = getClaims();
+        toast(t("authCreated"), "success");
+      } else {
+        const u = users[username];
+        if (!u || u.pwdHash !== pwdHash(password)) return fail(t("authBad"));
+        setSession(username); App.user = u; App.claims = getClaims();
+        toast(t("authOk"), "success");
+      }
+      App.route = "overview"; render(); return;
+    }
+
+    if (!App.user) return;
+
+    if (kind === "post") {
+      const text = (form.text.value || "").trim();
+      if (!text) return toast(t("postEmpty"), "error");
+      if (text.length > 280) return toast(t("postTooLong"), "error");
+      const c = myCountry();
+      App.user.posts.unshift({
+        id: "post-" + Date.now() + "-" + Math.random().toString(36).slice(2,6),
+        authorId: c.id, authorFlag: c.flag,
+        authorName: { fa: c.name.fa, en: c.name.en },
+        text, createdAt: Date.now(), likes: 0, isMine: true
+      });
+      persistCurrent(); form.reset(); render(); return;
+    }
+    if (kind === "war") {
+      const target = form.target.value;
+      const justification = (form.justification.value || "").trim();
+      const demands = (form.demands.value || "").trim();
+      if (justification.length < 5) return toast(t("err"), "error");
+      App.user.warProposals.unshift({
+        id: "war-" + Date.now(), targetId: target,
+        justification, demands, status: "pending",
+        createdAt: Date.now(), history: [{ at: Date.now(), status: "pending" }]
+      });
+      addNotif(App.user, "war", "Proposal submitted", target);
+      persistCurrent(); form.reset(); toast(t("proposalOk"), "success"); render(); return;
+    }
+    if (kind === "chat") {
+      if (!App.user.allianceId) return;
+      const text = (form.text.value || "").trim();
+      if (!text || text.length > 400) return;
+      App.user.allianceMessages.unshift({
+        id: "msg-" + Date.now(), author: App.user.username, text, createdAt: Date.now()
+      });
+      persistCurrent(); form.reset(); render(); return;
+    }
+    if (kind === "ai") {
+      const prompt = (form.prompt.value || "").trim();
+      if (!prompt) return;
+      const res = localAdvisor(App.aiAssistant, prompt);
+      App.user.aiHistory.push({ assistant: App.aiAssistant, prompt, response: res, at: Date.now() });
+      persistCurrent(); form.reset(); render(); return;
+    }
+  });
+}
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+(function boot() {
+  applyLang();
+  App.user = loadCurrentFromSession();
+  App.claims = getClaims();
+  render();
+})();
+</script>
+</body>
+</html>
